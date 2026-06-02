@@ -14,7 +14,359 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          password: string
+          session_token: string | null
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          password: string
+          session_token?: string | null
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          password?: string
+          session_token?: string | null
+          username?: string
+        }
+        Relationships: []
+      }
+      bookings: {
+        Row: {
+          admin_notes: string | null
+          county: string
+          created_at: string
+          email: string
+          estimated_cost_kes: number
+          event_date: string
+          event_type: string
+          full_name: string
+          id: string
+          number_of_ushers: number
+          package_price_kes: number
+          package_slug: string
+          phone: string
+          reference: string
+          special_instructions: string | null
+          status: string
+          updated_at: string
+          venue: string
+        }
+        Insert: {
+          admin_notes?: string | null
+          county: string
+          created_at?: string
+          email: string
+          estimated_cost_kes: number
+          event_date: string
+          event_type: string
+          full_name: string
+          id?: string
+          number_of_ushers: number
+          package_price_kes: number
+          package_slug: string
+          phone: string
+          reference: string
+          special_instructions?: string | null
+          status?: string
+          updated_at?: string
+          venue: string
+        }
+        Update: {
+          admin_notes?: string | null
+          county?: string
+          created_at?: string
+          email?: string
+          estimated_cost_kes?: number
+          event_date?: string
+          event_type?: string
+          full_name?: string
+          id?: string
+          number_of_ushers?: number
+          package_price_kes?: number
+          package_slug?: string
+          phone?: string
+          reference?: string
+          special_instructions?: string | null
+          status?: string
+          updated_at?: string
+          venue?: string
+        }
+        Relationships: []
+      }
+      chat_conversations: {
+        Row: {
+          created_at: string
+          id: string
+          last_message_at: string
+          status: string
+          visitor_email: string | null
+          visitor_name: string
+          visitor_phone: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          status?: string
+          visitor_email?: string | null
+          visitor_name: string
+          visitor_phone: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          last_message_at?: string
+          status?: string
+          visitor_email?: string | null
+          visitor_name?: string
+          visitor_phone?: string
+        }
+        Relationships: []
+      }
+      chat_messages: {
+        Row: {
+          body: string | null
+          conversation_id: string
+          created_at: string
+          id: string
+          image_url: string | null
+          sender: string
+        }
+        Insert: {
+          body?: string | null
+          conversation_id: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          sender: string
+        }
+        Update: {
+          body?: string | null
+          conversation_id?: string
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          sender?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "chat_messages_conversation_id_fkey"
+            columns: ["conversation_id"]
+            isOneToOne: false
+            referencedRelation: "chat_conversations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      contact_submissions: {
+        Row: {
+          created_at: string
+          email: string
+          full_name: string
+          id: string
+          message: string
+          phone: string | null
+          subject: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          full_name: string
+          id?: string
+          message: string
+          phone?: string | null
+          subject?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          full_name?: string
+          id?: string
+          message?: string
+          phone?: string | null
+          subject?: string | null
+        }
+        Relationships: []
+      }
+      faqs: {
+        Row: {
+          answer: string
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          question: string
+        }
+        Insert: {
+          answer: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          question: string
+        }
+        Update: {
+          answer?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          question?: string
+        }
+        Relationships: []
+      }
+      gallery_images: {
+        Row: {
+          caption: string | null
+          category: string
+          created_at: string
+          display_order: number
+          id: string
+          image_url: string
+        }
+        Insert: {
+          caption?: string | null
+          category: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url: string
+        }
+        Update: {
+          caption?: string | null
+          category?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          image_url?: string
+        }
+        Relationships: []
+      }
+      pricing_packages: {
+        Row: {
+          description: string
+          display_order: number
+          features: Json
+          id: string
+          name: string
+          price_kes: number
+          slug: string
+          updated_at: string
+        }
+        Insert: {
+          description: string
+          display_order?: number
+          features?: Json
+          id?: string
+          name: string
+          price_kes: number
+          slug: string
+          updated_at?: string
+        }
+        Update: {
+          description?: string
+          display_order?: number
+          features?: Json
+          id?: string
+          name?: string
+          price_kes?: number
+          slug?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      services: {
+        Row: {
+          created_at: string
+          description: string
+          display_order: number
+          id: string
+          image_url: string | null
+          is_active: boolean
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description: string
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      site_settings: {
+        Row: {
+          key: string
+          updated_at: string
+          value: string
+        }
+        Insert: {
+          key: string
+          updated_at?: string
+          value: string
+        }
+        Update: {
+          key?: string
+          updated_at?: string
+          value?: string
+        }
+        Relationships: []
+      }
+      testimonials: {
+        Row: {
+          author: string
+          created_at: string
+          display_order: number
+          id: string
+          is_active: boolean
+          quote: string
+          rating: number
+          role: string | null
+        }
+        Insert: {
+          author: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          quote: string
+          rating?: number
+          role?: string | null
+        }
+        Update: {
+          author?: string
+          created_at?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          quote?: string
+          rating?: number
+          role?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
