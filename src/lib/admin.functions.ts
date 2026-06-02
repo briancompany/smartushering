@@ -81,7 +81,7 @@ export const adminUpdateBooking = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ data }) => {
     await requireAdmin(data.token);
-    const update: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    const update: { updated_at: string; status?: "pending" | "approved" | "rejected" | "completed"; admin_notes?: string } = { updated_at: new Date().toISOString() };
     if (data.status) update.status = data.status;
     if (data.admin_notes !== undefined) update.admin_notes = data.admin_notes;
     const { error } = await supabaseAdmin.from("bookings").update(update).eq("id", data.id);
