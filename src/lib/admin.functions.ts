@@ -104,12 +104,27 @@ export const adminUpdateBooking = createServerFn({ method: "POST" })
     admin_notes: z.string().max(2000).optional(),
   }).parse(d))
   .handler(async ({ data }) => {
-    await requireAdmin(data.token);
+    const admin = await requireAdmin(data.token);
     const update: { updated_at: string; status?: "pending" | "approved" | "rejected" | "completed"; admin_notes?: string } = { updated_at: new Date().toISOString() };
     if (data.status) update.status = data.status;
     if (data.admin_notes !== undefined) update.admin_notes = data.admin_notes;
     const { error } = await supabaseAdmin.from("bookings").update(update).eq("id", data.id);
     if (error) throw new Error(error.message);
+    await logAudit({ actor: admin.username, action: "booking.update", entity: "booking", entity_id: data.id, diff: update });
+    return { ok: true };
+  });
+
+export const adminUpdatePricing = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({
+    token: z.string(),
+    id: z.string().uuid(),
+    price_kes: z.number().int().min(0).max(10000000),
+  }).parse(d))
+  .handler(async ({ data }) => {
+    const admin = await requireAdmin(data.token);
+    const { error } = await supabaseAdmin.from("pricing_packages").update({ price_kes: data.price_kes, updated_at: new Date().toISOString() }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await logAudit({ actor: admin.username, action: "pricing.update", entity: "pricing_package", entity_id: data.id, diff: { price_kes: data.price_kes } });
     return { ok: true };
   });
 
