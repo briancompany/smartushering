@@ -2,7 +2,8 @@ import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
 import { LayoutDashboard, Calendar, DollarSign, Wrench, Image as ImageIcon, MessageSquare, HelpCircle, LogOut, ArrowLeft, Menu, X } from "lucide-react";
 
-const NAV = [
+type NavItem = { to: string; label: string; Icon: typeof LayoutDashboard; exact?: boolean };
+const NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", Icon: LayoutDashboard, exact: true },
   { to: "/admin/bookings", label: "Bookings", Icon: Calendar },
   { to: "/admin/pricing", label: "Pricing", Icon: DollarSign },
@@ -10,7 +11,7 @@ const NAV = [
   { to: "/admin/gallery", label: "Gallery", Icon: ImageIcon },
   { to: "/admin/chats", label: "Live Chats", Icon: MessageSquare },
   { to: "/admin/faqs", label: "FAQs", Icon: HelpCircle },
-] as const;
+];
 
 export function useAdminToken() {
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           {NAV.map(({ to, label, Icon, exact }) => {
             const active = exact ? location.pathname === to : location.pathname.startsWith(to);
             return (
-              <Link key={to} to={to} onClick={() => setOpen(false)} className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm ${active ? "bg-gold text-gold-foreground font-semibold" : "text-primary-foreground/80 hover:bg-white/10"}`}>
+              <Link key={to} to={to as "/admin"} onClick={() => setOpen(false)} className={`flex items-center gap-3 rounded-md px-3 py-2.5 text-sm ${active ? "bg-gold text-gold-foreground font-semibold" : "text-primary-foreground/80 hover:bg-white/10"}`}>
                 <Icon className="h-4 w-4" />{label}
               </Link>
             );

@@ -24,7 +24,7 @@ export function SiteFooter() {
           <h4 className="text-sm font-semibold uppercase tracking-wider text-gold">Contact</h4>
           <ul className="mt-4 space-y-3 text-sm text-primary-foreground/80">
             <li className="flex items-start gap-2"><Phone className="mt-0.5 h-4 w-4 text-gold" /><a href="tel:+254112836281" className="hover:text-gold">0112 836 281</a></li>
-            <li className="flex items-start gap-2"><Mail className="mt-0.5 h-4 w-4 text-gold" /><a href="mailto:ayietalensa@gmail.com" className="hover:text-gold break-all">ayietalensa@gmail.com</a></li>
+            <li className="flex items-start gap-2"><Mail className="mt-0.5 h-4 w-4 text-gold" /><a href="mailto:Smartushering@gmail.com" className="hover:text-gold break-all">Smartushering@gmail.com</a></li>
             <li className="flex items-start gap-2"><MapPin className="mt-0.5 h-4 w-4 text-gold" /><span>Nairobi, Kenya · Nationwide</span></li>
           </ul>
         </div>
