@@ -13,7 +13,7 @@ export async function logAudit(opts: {
       action: opts.action,
       entity: opts.entity,
       entity_id: opts.entity_id ?? null,
-      diff: opts.diff ?? null,
+      diff: (opts.diff ?? null) as never,
     });
   } catch (e) {
     console.error("[audit] failed", e);
