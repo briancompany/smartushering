@@ -14,29 +14,143 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_login_attempts: {
+        Row: {
+          created_at: string
+          id: string
+          ip: string | null
+          success: boolean
+          username: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          success: boolean
+          username?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          ip?: string | null
+          success?: boolean
+          username?: string | null
+        }
+        Relationships: []
+      }
       admin_users: {
         Row: {
           created_at: string
           id: string
+          last_active_at: string | null
           password: string
+          session_expires_at: string | null
           session_token: string | null
           username: string
         }
         Insert: {
           created_at?: string
           id?: string
+          last_active_at?: string | null
           password: string
+          session_expires_at?: string | null
           session_token?: string | null
           username: string
         }
         Update: {
           created_at?: string
           id?: string
+          last_active_at?: string | null
           password?: string
+          session_expires_at?: string | null
           session_token?: string | null
           username?: string
         }
         Relationships: []
+      }
+      audit_logs: {
+        Row: {
+          action: string
+          actor: string
+          created_at: string
+          diff: Json | null
+          entity: string
+          entity_id: string | null
+          id: string
+          ip: string | null
+        }
+        Insert: {
+          action: string
+          actor: string
+          created_at?: string
+          diff?: Json | null
+          entity: string
+          entity_id?: string | null
+          id?: string
+          ip?: string | null
+        }
+        Update: {
+          action?: string
+          actor?: string
+          created_at?: string
+          diff?: Json | null
+          entity?: string
+          entity_id?: string | null
+          id?: string
+          ip?: string | null
+        }
+        Relationships: []
+      }
+      booking_assignments: {
+        Row: {
+          booking_id: string
+          created_at: string
+          id: string
+          is_team_leader: boolean
+          notes: string | null
+          report_time: string | null
+          staff_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          id?: string
+          is_team_leader?: boolean
+          notes?: string | null
+          report_time?: string | null
+          staff_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          id?: string
+          is_team_leader?: boolean
+          notes?: string | null
+          report_time?: string | null
+          staff_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "booking_assignments_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "booking_assignments_staff_id_fkey"
+            columns: ["staff_id"]
+            isOneToOne: false
+            referencedRelation: "staff"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       bookings: {
         Row: {
@@ -250,6 +364,42 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          entity_id: string | null
+          entity_type: string | null
+          id: string
+          link: string | null
+          read_at: string | null
+          title: string
+          type: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title: string
+          type: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          entity_id?: string | null
+          entity_type?: string | null
+          id?: string
+          link?: string | null
+          read_at?: string | null
+          title?: string
+          type?: string
+        }
+        Relationships: []
+      }
       pricing_packages: {
         Row: {
           description: string
@@ -282,6 +432,86 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      quotes: {
+        Row: {
+          booking_id: string | null
+          county: string | null
+          created_at: string
+          customer_email: string
+          customer_name: string
+          customer_phone: string | null
+          event_date: string | null
+          event_type: string
+          id: string
+          notes: string | null
+          number_of_ushers: number
+          package_name: string | null
+          package_price_kes: number
+          package_slug: string | null
+          pdf_path: string | null
+          reference: string
+          sent_at: string | null
+          subtotal_kes: number
+          total_kes: number
+          transport_kes: number
+          venue: string | null
+        }
+        Insert: {
+          booking_id?: string | null
+          county?: string | null
+          created_at?: string
+          customer_email: string
+          customer_name: string
+          customer_phone?: string | null
+          event_date?: string | null
+          event_type: string
+          id?: string
+          notes?: string | null
+          number_of_ushers: number
+          package_name?: string | null
+          package_price_kes: number
+          package_slug?: string | null
+          pdf_path?: string | null
+          reference: string
+          sent_at?: string | null
+          subtotal_kes: number
+          total_kes: number
+          transport_kes?: number
+          venue?: string | null
+        }
+        Update: {
+          booking_id?: string | null
+          county?: string | null
+          created_at?: string
+          customer_email?: string
+          customer_name?: string
+          customer_phone?: string | null
+          event_date?: string | null
+          event_type?: string
+          id?: string
+          notes?: string | null
+          number_of_ushers?: number
+          package_name?: string | null
+          package_price_kes?: number
+          package_slug?: string | null
+          pdf_path?: string | null
+          reference?: string
+          sent_at?: string | null
+          subtotal_kes?: number
+          total_kes?: number
+          transport_kes?: number
+          venue?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "quotes_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       services: {
         Row: {
@@ -331,6 +561,42 @@ export type Database = {
           key?: string
           updated_at?: string
           value?: string
+        }
+        Relationships: []
+      }
+      staff: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          is_active: boolean
+          notes: string | null
+          phone: string
+          role: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          phone: string
+          role?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          notes?: string | null
+          phone?: string
+          role?: string
+          updated_at?: string
         }
         Relationships: []
       }

@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
+import { logAudit } from "./audit.server";
 
 function randomToken() {
   return Array.from(crypto.getRandomValues(new Uint8Array(32)))
@@ -10,28 +11,53 @@ function randomToken() {
 
 async function requireAdmin(token: string) {
   if (!token) throw new Error("Unauthorized");
-  const { data, error } = await supabaseAdmin
+  const { data } = await supabaseAdmin
     .from("admin_users")
-    .select("id, username")
+    .select("id, username, session_expires_at")
     .eq("session_token", token)
     .maybeSingle();
-  if (error || !data) throw new Error("Unauthorized");
+  if (!data) throw new Error("Unauthorized");
+  if (data.session_expires_at && new Date(data.session_expires_at) < new Date()) {
+    throw new Error("Session expired");
+  }
+  await supabaseAdmin.from("admin_users").update({
+    last_active_at: new Date().toISOString(),
+    session_expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+  }).eq("id", data.id);
   return data;
 }
 
 export const adminLogin = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ username: z.string().min(1).max(100), password: z.string().min(1).max(200) }).parse(d))
   .handler(async ({ data }) => {
+    // throttling: 5 failed attempts per username in last 15 minutes
+    const since = new Date(Date.now() - 15 * 60 * 1000).toISOString();
+    const { count: fails } = await supabaseAdmin
+      .from("admin_login_attempts")
+      .select("id", { count: "exact", head: true })
+      .eq("username", data.username).eq("success", false).gte("created_at", since);
+    if ((fails ?? 0) >= 5) {
+      throw new Error("Too many failed attempts. Try again in 15 minutes.");
+    }
     const { data: rows, error } = await supabaseAdmin.rpc("verify_admin_password", {
-      _username: data.username,
-      _password: data.password,
+      _username: data.username, _password: data.password,
     });
     const user = Array.isArray(rows) ? rows[0] : null;
-    if (error || !user) throw new Error("Invalid username or password");
+    if (error || !user) {
+      await supabaseAdmin.from("admin_login_attempts").insert({ username: data.username, success: false });
+      throw new Error("Invalid username or password");
+    }
     const token = randomToken();
-    await supabaseAdmin.from("admin_users").update({ session_token: token }).eq("id", user.id);
+    await supabaseAdmin.from("admin_users").update({
+      session_token: token,
+      session_expires_at: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString(),
+      last_active_at: new Date().toISOString(),
+    }).eq("id", user.id);
+    await supabaseAdmin.from("admin_login_attempts").insert({ username: data.username, success: true });
+    await logAudit({ actor: user.username, action: "admin.login", entity: "admin_user", entity_id: user.id });
     return { token, username: user.username };
   });
+
 
 export const adminVerify = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ token: z.string().min(1) }).parse(d))
@@ -78,12 +104,13 @@ export const adminUpdateBooking = createServerFn({ method: "POST" })
     admin_notes: z.string().max(2000).optional(),
   }).parse(d))
   .handler(async ({ data }) => {
-    await requireAdmin(data.token);
+    const admin = await requireAdmin(data.token);
     const update: { updated_at: string; status?: "pending" | "approved" | "rejected" | "completed"; admin_notes?: string } = { updated_at: new Date().toISOString() };
     if (data.status) update.status = data.status;
     if (data.admin_notes !== undefined) update.admin_notes = data.admin_notes;
     const { error } = await supabaseAdmin.from("bookings").update(update).eq("id", data.id);
     if (error) throw new Error(error.message);
+    await logAudit({ actor: admin.username, action: "booking.update", entity: "booking", entity_id: data.id, diff: update });
     return { ok: true };
   });
 
@@ -94,9 +121,10 @@ export const adminUpdatePricing = createServerFn({ method: "POST" })
     price_kes: z.number().int().min(0).max(10000000),
   }).parse(d))
   .handler(async ({ data }) => {
-    await requireAdmin(data.token);
+    const admin = await requireAdmin(data.token);
     const { error } = await supabaseAdmin.from("pricing_packages").update({ price_kes: data.price_kes, updated_at: new Date().toISOString() }).eq("id", data.id);
     if (error) throw new Error(error.message);
+    await logAudit({ actor: admin.username, action: "pricing.update", entity: "pricing_package", entity_id: data.id, diff: { price_kes: data.price_kes } });
     return { ok: true };
   });
 
