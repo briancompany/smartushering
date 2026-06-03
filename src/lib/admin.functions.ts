@@ -128,19 +128,6 @@ export const adminUpdatePricing = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const adminUpdatePricing = createServerFn({ method: "POST" })
-  .inputValidator((d) => z.object({
-    token: z.string(),
-    id: z.string().uuid(),
-    price_kes: z.number().int().min(0).max(10000000),
-  }).parse(d))
-  .handler(async ({ data }) => {
-    await requireAdmin(data.token);
-    const { error } = await supabaseAdmin.from("pricing_packages").update({ price_kes: data.price_kes, updated_at: new Date().toISOString() }).eq("id", data.id);
-    if (error) throw new Error(error.message);
-    return { ok: true };
-  });
-
 export const adminUpdateSetting = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ token: z.string(), key: z.string().max(64), value: z.string().max(2000) }).parse(d))
   .handler(async ({ data }) => {
