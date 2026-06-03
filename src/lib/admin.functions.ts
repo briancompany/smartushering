@@ -22,14 +22,12 @@ async function requireAdmin(token: string) {
 export const adminLogin = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ username: z.string().min(1).max(100), password: z.string().min(1).max(200) }).parse(d))
   .handler(async ({ data }) => {
-    const { data: user, error } = await supabaseAdmin
-      .from("admin_users")
-      .select("id, username, password")
-      .eq("username", data.username)
-      .maybeSingle();
-    if (error || !user || user.password !== data.password) {
-      throw new Error("Invalid username or password");
-    }
+    const { data: rows, error } = await supabaseAdmin.rpc("verify_admin_password", {
+      _username: data.username,
+      _password: data.password,
+    });
+    const user = Array.isArray(rows) ? rows[0] : null;
+    if (error || !user) throw new Error("Invalid username or password");
     const token = randomToken();
     await supabaseAdmin.from("admin_users").update({ session_token: token }).eq("id", user.id);
     return { token, username: user.username };

@@ -80,7 +80,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
           name: "Smart Ushering",
           image: "/og-image.jpg",
           telephone: "+254112836281",
-          email: "ayietalensa@gmail.com",
+          email: "Smartushering@gmail.com",
           address: { "@type": "PostalAddress", addressLocality: "Nairobi", addressCountry: "KE" },
           areaServed: "Kenya",
           slogan: "Every Guest Matters. Every Event Counts.",

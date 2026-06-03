@@ -36,7 +36,7 @@ function Page() {
               <h2 className="font-display text-xl font-semibold text-navy">Reach us directly</h2>
               <ul className="mt-4 space-y-3 text-sm">
                 <li className="flex gap-3"><Phone className="h-5 w-5 text-gold" /><a href="tel:+254112836281" className="hover:text-navy">0112 836 281</a></li>
-                <li className="flex gap-3"><Mail className="h-5 w-5 text-gold" /><a href="mailto:ayietalensa@gmail.com" className="hover:text-navy break-all">ayietalensa@gmail.com</a></li>
+                <li className="flex gap-3"><Mail className="h-5 w-5 text-gold" /><a href="mailto:Smartushering@gmail.com" className="hover:text-navy break-all">Smartushering@gmail.com</a></li>
                 <li className="flex gap-3"><MapPin className="h-5 w-5 text-gold" /><span>Nairobi, Kenya · Available Nationwide</span></li>
               </ul>
               <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="mt-5 inline-block rounded-md bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white">Chat on WhatsApp</a>
