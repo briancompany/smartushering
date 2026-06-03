@@ -18,13 +18,21 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminStaffRouteImport } from './routes/admin/staff'
 import { Route as AdminServicesRouteImport } from './routes/admin/services'
+import { Route as AdminQuotesRouteImport } from './routes/admin/quotes'
 import { Route as AdminPricingRouteImport } from './routes/admin/pricing'
+import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
+import { Route as AdminMessagesRouteImport } from './routes/admin/messages'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminGalleryRouteImport } from './routes/admin/gallery'
 import { Route as AdminFaqsRouteImport } from './routes/admin/faqs'
 import { Route as AdminChatsRouteImport } from './routes/admin/chats'
+import { Route as AdminCalendarRouteImport } from './routes/admin/calendar'
 import { Route as AdminBookingsRouteImport } from './routes/admin/bookings'
+import { Route as AdminAuditRouteImport } from './routes/admin/audit'
+import { Route as AdminAssignmentsRouteImport } from './routes/admin/assignments'
+import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 
 const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
   id: '/sitemap.xml',
@@ -71,14 +79,34 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
   path: '/admin/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminStaffRoute = AdminStaffRouteImport.update({
+  id: '/admin/staff',
+  path: '/admin/staff',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminServicesRoute = AdminServicesRouteImport.update({
   id: '/admin/services',
   path: '/admin/services',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminQuotesRoute = AdminQuotesRouteImport.update({
+  id: '/admin/quotes',
+  path: '/admin/quotes',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminPricingRoute = AdminPricingRouteImport.update({
   id: '/admin/pricing',
   path: '/admin/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminNotificationsRoute = AdminNotificationsRouteImport.update({
+  id: '/admin/notifications',
+  path: '/admin/notifications',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminMessagesRoute = AdminMessagesRouteImport.update({
+  id: '/admin/messages',
+  path: '/admin/messages',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
@@ -101,9 +129,29 @@ const AdminChatsRoute = AdminChatsRouteImport.update({
   path: '/admin/chats',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminCalendarRoute = AdminCalendarRouteImport.update({
+  id: '/admin/calendar',
+  path: '/admin/calendar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminBookingsRoute = AdminBookingsRouteImport.update({
   id: '/admin/bookings',
   path: '/admin/bookings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAuditRoute = AdminAuditRouteImport.update({
+  id: '/admin/audit',
+  path: '/admin/audit',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAssignmentsRoute = AdminAssignmentsRouteImport.update({
+  id: '/admin/assignments',
+  path: '/admin/assignments',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
+  id: '/admin/analytics',
+  path: '/admin/analytics',
   getParentRoute: () => rootRouteImport,
 } as any)
 
@@ -116,13 +164,21 @@ export interface FileRoutesByFullPath {
   '/pricing': typeof PricingRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/assignments': typeof AdminAssignmentsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/calendar': typeof AdminCalendarRoute
   '/admin/chats': typeof AdminChatsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/pricing': typeof AdminPricingRoute
+  '/admin/quotes': typeof AdminQuotesRoute
   '/admin/services': typeof AdminServicesRoute
+  '/admin/staff': typeof AdminStaffRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRoutesByTo {
@@ -134,13 +190,21 @@ export interface FileRoutesByTo {
   '/pricing': typeof PricingRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/assignments': typeof AdminAssignmentsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/calendar': typeof AdminCalendarRoute
   '/admin/chats': typeof AdminChatsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/pricing': typeof AdminPricingRoute
+  '/admin/quotes': typeof AdminQuotesRoute
   '/admin/services': typeof AdminServicesRoute
+  '/admin/staff': typeof AdminStaffRoute
   '/admin': typeof AdminIndexRoute
 }
 export interface FileRoutesById {
@@ -153,13 +217,21 @@ export interface FileRoutesById {
   '/pricing': typeof PricingRoute
   '/services': typeof ServicesRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/assignments': typeof AdminAssignmentsRoute
+  '/admin/audit': typeof AdminAuditRoute
   '/admin/bookings': typeof AdminBookingsRoute
+  '/admin/calendar': typeof AdminCalendarRoute
   '/admin/chats': typeof AdminChatsRoute
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/messages': typeof AdminMessagesRoute
+  '/admin/notifications': typeof AdminNotificationsRoute
   '/admin/pricing': typeof AdminPricingRoute
+  '/admin/quotes': typeof AdminQuotesRoute
   '/admin/services': typeof AdminServicesRoute
+  '/admin/staff': typeof AdminStaffRoute
   '/admin/': typeof AdminIndexRoute
 }
 export interface FileRouteTypes {
@@ -173,13 +245,21 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/services'
     | '/sitemap.xml'
+    | '/admin/analytics'
+    | '/admin/assignments'
+    | '/admin/audit'
     | '/admin/bookings'
+    | '/admin/calendar'
     | '/admin/chats'
     | '/admin/faqs'
     | '/admin/gallery'
     | '/admin/login'
+    | '/admin/messages'
+    | '/admin/notifications'
     | '/admin/pricing'
+    | '/admin/quotes'
     | '/admin/services'
+    | '/admin/staff'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -191,13 +271,21 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/services'
     | '/sitemap.xml'
+    | '/admin/analytics'
+    | '/admin/assignments'
+    | '/admin/audit'
     | '/admin/bookings'
+    | '/admin/calendar'
     | '/admin/chats'
     | '/admin/faqs'
     | '/admin/gallery'
     | '/admin/login'
+    | '/admin/messages'
+    | '/admin/notifications'
     | '/admin/pricing'
+    | '/admin/quotes'
     | '/admin/services'
+    | '/admin/staff'
     | '/admin'
   id:
     | '__root__'
@@ -209,13 +297,21 @@ export interface FileRouteTypes {
     | '/pricing'
     | '/services'
     | '/sitemap.xml'
+    | '/admin/analytics'
+    | '/admin/assignments'
+    | '/admin/audit'
     | '/admin/bookings'
+    | '/admin/calendar'
     | '/admin/chats'
     | '/admin/faqs'
     | '/admin/gallery'
     | '/admin/login'
+    | '/admin/messages'
+    | '/admin/notifications'
     | '/admin/pricing'
+    | '/admin/quotes'
     | '/admin/services'
+    | '/admin/staff'
     | '/admin/'
   fileRoutesById: FileRoutesById
 }
@@ -228,13 +324,21 @@ export interface RootRouteChildren {
   PricingRoute: typeof PricingRoute
   ServicesRoute: typeof ServicesRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminAssignmentsRoute: typeof AdminAssignmentsRoute
+  AdminAuditRoute: typeof AdminAuditRoute
   AdminBookingsRoute: typeof AdminBookingsRoute
+  AdminCalendarRoute: typeof AdminCalendarRoute
   AdminChatsRoute: typeof AdminChatsRoute
   AdminFaqsRoute: typeof AdminFaqsRoute
   AdminGalleryRoute: typeof AdminGalleryRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminMessagesRoute: typeof AdminMessagesRoute
+  AdminNotificationsRoute: typeof AdminNotificationsRoute
   AdminPricingRoute: typeof AdminPricingRoute
+  AdminQuotesRoute: typeof AdminQuotesRoute
   AdminServicesRoute: typeof AdminServicesRoute
+  AdminStaffRoute: typeof AdminStaffRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
@@ -303,6 +407,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/staff': {
+      id: '/admin/staff'
+      path: '/admin/staff'
+      fullPath: '/admin/staff'
+      preLoaderRoute: typeof AdminStaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/services': {
       id: '/admin/services'
       path: '/admin/services'
@@ -310,11 +421,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminServicesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/quotes': {
+      id: '/admin/quotes'
+      path: '/admin/quotes'
+      fullPath: '/admin/quotes'
+      preLoaderRoute: typeof AdminQuotesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/pricing': {
       id: '/admin/pricing'
       path: '/admin/pricing'
       fullPath: '/admin/pricing'
       preLoaderRoute: typeof AdminPricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/notifications': {
+      id: '/admin/notifications'
+      path: '/admin/notifications'
+      fullPath: '/admin/notifications'
+      preLoaderRoute: typeof AdminNotificationsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/messages': {
+      id: '/admin/messages'
+      path: '/admin/messages'
+      fullPath: '/admin/messages'
+      preLoaderRoute: typeof AdminMessagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/login': {
@@ -345,11 +477,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminChatsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/calendar': {
+      id: '/admin/calendar'
+      path: '/admin/calendar'
+      fullPath: '/admin/calendar'
+      preLoaderRoute: typeof AdminCalendarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/bookings': {
       id: '/admin/bookings'
       path: '/admin/bookings'
       fullPath: '/admin/bookings'
       preLoaderRoute: typeof AdminBookingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/audit': {
+      id: '/admin/audit'
+      path: '/admin/audit'
+      fullPath: '/admin/audit'
+      preLoaderRoute: typeof AdminAuditRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/assignments': {
+      id: '/admin/assignments'
+      path: '/admin/assignments'
+      fullPath: '/admin/assignments'
+      preLoaderRoute: typeof AdminAssignmentsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/analytics': {
+      id: '/admin/analytics'
+      path: '/admin/analytics'
+      fullPath: '/admin/analytics'
+      preLoaderRoute: typeof AdminAnalyticsRouteImport
       parentRoute: typeof rootRouteImport
     }
   }
@@ -364,13 +524,21 @@ const rootRouteChildren: RootRouteChildren = {
   PricingRoute: PricingRoute,
   ServicesRoute: ServicesRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
+  AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminAssignmentsRoute: AdminAssignmentsRoute,
+  AdminAuditRoute: AdminAuditRoute,
   AdminBookingsRoute: AdminBookingsRoute,
+  AdminCalendarRoute: AdminCalendarRoute,
   AdminChatsRoute: AdminChatsRoute,
   AdminFaqsRoute: AdminFaqsRoute,
   AdminGalleryRoute: AdminGalleryRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminMessagesRoute: AdminMessagesRoute,
+  AdminNotificationsRoute: AdminNotificationsRoute,
   AdminPricingRoute: AdminPricingRoute,
+  AdminQuotesRoute: AdminQuotesRoute,
   AdminServicesRoute: AdminServicesRoute,
+  AdminStaffRoute: AdminStaffRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 export const routeTree = rootRouteImport
