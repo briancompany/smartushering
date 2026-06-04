@@ -71,7 +71,7 @@ export const adminUpdateReview = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ data }) => {
     const admin = await requireAdmin(data.token);
-    const update: Record<string, unknown> = { updated_at: new Date().toISOString() };
+    const update: { updated_at: string; is_approved?: boolean; display_order?: number } = { updated_at: new Date().toISOString() };
     if (data.is_approved !== undefined) update.is_approved = data.is_approved;
     if (data.display_order !== undefined) update.display_order = data.display_order;
     const { error } = await supabaseAdmin.from("reviews").update(update).eq("id", data.id);
