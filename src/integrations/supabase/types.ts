@@ -513,6 +513,69 @@ export type Database = {
           },
         ]
       }
+      rate_limits: {
+        Row: {
+          bucket: string
+          created_at: string
+          id: number
+          identifier: string
+        }
+        Insert: {
+          bucket: string
+          created_at?: string
+          id?: number
+          identifier: string
+        }
+        Update: {
+          bucket?: string
+          created_at?: string
+          id?: number
+          identifier?: string
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          author: string
+          created_at: string
+          display_order: number
+          email: string | null
+          event_type: string | null
+          id: string
+          is_approved: boolean
+          quote: string
+          rating: number
+          role: string | null
+          updated_at: string
+        }
+        Insert: {
+          author: string
+          created_at?: string
+          display_order?: number
+          email?: string | null
+          event_type?: string | null
+          id?: string
+          is_approved?: boolean
+          quote: string
+          rating: number
+          role?: string | null
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          created_at?: string
+          display_order?: number
+          email?: string | null
+          event_type?: string | null
+          id?: string
+          is_approved?: boolean
+          quote?: string
+          rating?: number
+          role?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           created_at: string
