@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Calendar, DollarSign, Wrench, Image as ImageIcon, MessageSquare, HelpCircle, LogOut, ArrowLeft, Menu, X, Users, ClipboardCheck, FileText, BarChart3, ShieldCheck, Mail } from "lucide-react";
+import { LayoutDashboard, Calendar, DollarSign, Wrench, Image as ImageIcon, MessageSquare, HelpCircle, LogOut, ArrowLeft, Menu, X, Users, ClipboardCheck, FileText, BarChart3, ShieldCheck, Mail, Star, Database } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 
 type NavItem = { to: string; label: string; Icon: typeof LayoutDashboard; exact?: boolean };
@@ -15,9 +15,11 @@ const NAV: NavItem[] = [
   { to: "/admin/pricing", label: "Pricing", Icon: DollarSign },
   { to: "/admin/services", label: "Services", Icon: Wrench },
   { to: "/admin/gallery", label: "Gallery", Icon: ImageIcon },
+  { to: "/admin/reviews", label: "Reviews", Icon: Star },
   { to: "/admin/chats", label: "Live Chats", Icon: MessageSquare },
   { to: "/admin/messages", label: "Messages", Icon: Mail },
   { to: "/admin/faqs", label: "FAQs", Icon: HelpCircle },
+  { to: "/admin/backups", label: "Backups", Icon: Database },
   { to: "/admin/audit", label: "Audit Log", Icon: ShieldCheck },
 ];
 
