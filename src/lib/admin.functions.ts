@@ -328,7 +328,7 @@ export const adminCreateAccount = createServerFn({ method: "POST" })
       _phone: data.phone,
       _password: data.password,
       _role: data.role,
-      _department: data.department || null,
+      _department: data.department || "",
       _is_department_head: data.is_department_head,
       _created_by: admin.id,
     });
@@ -350,7 +350,7 @@ export const adminUpdateAccount = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ data }) => {
     const admin = await requireSuperAdmin(data.token);
-    const upd: Record<string, unknown> = {};
+    const upd: { is_active?: boolean; department?: string; phone?: string; full_name?: string; is_department_head?: boolean } = {};
     if (data.is_active !== undefined) upd.is_active = data.is_active;
     if (data.department !== undefined) upd.department = data.department;
     if (data.phone !== undefined) upd.phone = data.phone;
