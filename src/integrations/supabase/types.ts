@@ -41,29 +41,59 @@ export type Database = {
       admin_users: {
         Row: {
           created_at: string
+          created_by: string | null
+          department: string | null
+          full_name: string | null
           id: string
+          is_active: boolean
+          is_department_head: boolean
+          is_super_admin: boolean
           last_active_at: string | null
           password: string
+          phone: string | null
+          remember_me_until: string | null
+          role: Database["public"]["Enums"]["app_role"]
           session_expires_at: string | null
           session_token: string | null
+          staff_id: string | null
           username: string
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
+          department?: string | null
+          full_name?: string | null
           id?: string
+          is_active?: boolean
+          is_department_head?: boolean
+          is_super_admin?: boolean
           last_active_at?: string | null
           password: string
+          phone?: string | null
+          remember_me_until?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           session_expires_at?: string | null
           session_token?: string | null
+          staff_id?: string | null
           username: string
         }
         Update: {
           created_at?: string
+          created_by?: string | null
+          department?: string | null
+          full_name?: string | null
           id?: string
+          is_active?: boolean
+          is_department_head?: boolean
+          is_super_admin?: boolean
           last_active_at?: string | null
           password?: string
+          phone?: string | null
+          remember_me_until?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
           session_expires_at?: string | null
           session_token?: string | null
+          staff_id?: string | null
           username?: string
         }
         Relationships: []
@@ -701,6 +731,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_staff_account: {
+        Args: {
+          _created_by: string
+          _department: string
+          _full_name: string
+          _is_department_head: boolean
+          _password: string
+          _phone: string
+          _role: Database["public"]["Enums"]["app_role"]
+          _staff_id: string
+          _username: string
+        }
+        Returns: string
+      }
+      update_account_password: {
+        Args: { _id: string; _password: string }
+        Returns: undefined
+      }
       verify_admin_password: {
         Args: { _password: string; _username: string }
         Returns: {
@@ -708,9 +756,29 @@ export type Database = {
           username: string
         }[]
       }
+      verify_login: {
+        Args: { _identifier: string; _password: string }
+        Returns: {
+          department: string
+          full_name: string
+          id: string
+          is_department_head: boolean
+          is_super_admin: boolean
+          role: Database["public"]["Enums"]["app_role"]
+          staff_id: string
+          username: string
+        }[]
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "super_admin"
+        | "staff_management"
+        | "bookings_operations"
+        | "customer_support"
+        | "media_content"
+        | "finance_reporting"
+        | "staff"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -837,6 +905,16 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "super_admin",
+        "staff_management",
+        "bookings_operations",
+        "customer_support",
+        "media_content",
+        "finance_reporting",
+        "staff",
+      ],
+    },
   },
 } as const
