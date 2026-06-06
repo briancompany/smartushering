@@ -36,13 +36,13 @@ export function clearSession() {
 
 // Role → which top-level nav items are visible
 export const ROLE_NAV: Record<string, string[]> = {
-  super_admin: ["dashboard","analytics","bookings","calendar","staff","assignments","quotes","pricing","services","gallery","reviews","chats","messages","faqs","accounts","backups","audit"],
-  staff_management: ["dashboard","staff","assignments","accounts"],
-  bookings_operations: ["dashboard","bookings","calendar","assignments","quotes","pricing"],
-  customer_support: ["dashboard","chats","messages","bookings"],
-  media_content: ["dashboard","services","gallery","faqs","reviews"],
-  finance_reporting: ["dashboard","analytics","quotes"],
-  staff: ["dashboard","assignments"],
+  super_admin: ["dashboard","analytics","bookings","calendar","staff","assignments","announcements","grievances","assets","quotes","pricing","services","gallery","reviews","chats","messages","faqs","accounts","backups","audit"],
+  staff_management: ["dashboard","staff","assignments","accounts","announcements","grievances","assets"],
+  bookings_operations: ["dashboard","bookings","calendar","assignments","quotes","pricing","announcements"],
+  customer_support: ["dashboard","chats","messages","bookings","announcements","grievances"],
+  media_content: ["dashboard","services","gallery","faqs","reviews","announcements"],
+  finance_reporting: ["dashboard","analytics","quotes","announcements"],
+  staff: [],
 };
 
 export function canAccess(role: string, key: string, isSuperAdmin: boolean): boolean {
