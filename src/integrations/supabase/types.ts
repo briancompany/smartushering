@@ -98,6 +98,110 @@ export type Database = {
         }
         Relationships: []
       }
+      announcement_reads: {
+        Row: {
+          announcement_id: string
+          id: number
+          read_at: string
+          user_id: string
+        }
+        Insert: {
+          announcement_id: string
+          id?: number
+          read_at?: string
+          user_id: string
+        }
+        Update: {
+          announcement_id?: string
+          id?: number
+          read_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "announcement_reads_announcement_id_fkey"
+            columns: ["announcement_id"]
+            isOneToOne: false
+            referencedRelation: "announcements"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      announcements: {
+        Row: {
+          audience: string
+          body: string
+          created_at: string
+          created_by: string | null
+          expires_at: string | null
+          id: string
+          priority: string
+          target_value: string | null
+          title: string
+        }
+        Insert: {
+          audience?: string
+          body: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          priority?: string
+          target_value?: string | null
+          title: string
+        }
+        Update: {
+          audience?: string
+          body?: string
+          created_at?: string
+          created_by?: string | null
+          expires_at?: string | null
+          id?: string
+          priority?: string
+          target_value?: string | null
+          title?: string
+        }
+        Relationships: []
+      }
+      assets: {
+        Row: {
+          asset_code: string | null
+          assigned_at: string | null
+          assigned_to: string | null
+          category: string | null
+          condition: string
+          created_at: string
+          id: string
+          name: string
+          notes: string | null
+          updated_at: string
+        }
+        Insert: {
+          asset_code?: string | null
+          assigned_at?: string | null
+          assigned_to?: string | null
+          category?: string | null
+          condition?: string
+          created_at?: string
+          id?: string
+          name: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Update: {
+          asset_code?: string | null
+          assigned_at?: string | null
+          assigned_to?: string | null
+          category?: string | null
+          condition?: string
+          created_at?: string
+          id?: string
+          name?: string
+          notes?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       audit_logs: {
         Row: {
           action: string
@@ -310,6 +414,30 @@ export type Database = {
           },
         ]
       }
+      client_event_tokens: {
+        Row: {
+          booking_id: string
+          created_at: string
+          expires_at: string | null
+          id: string
+          token: string
+        }
+        Insert: {
+          booking_id: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          token: string
+        }
+        Update: {
+          booking_id?: string
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          token?: string
+        }
+        Relationships: []
+      }
       contact_submissions: {
         Row: {
           created_at: string
@@ -391,6 +519,54 @@ export type Database = {
           display_order?: number
           id?: string
           image_url?: string
+        }
+        Relationships: []
+      }
+      grievances: {
+        Row: {
+          admin_response: string | null
+          body: string
+          created_at: string
+          department: string | null
+          id: string
+          is_anonymous: boolean
+          responded_at: string | null
+          responded_by: string | null
+          status: string
+          subject: string
+          submitted_by: string | null
+          submitted_by_name: string | null
+          updated_at: string
+        }
+        Insert: {
+          admin_response?: string | null
+          body: string
+          created_at?: string
+          department?: string | null
+          id?: string
+          is_anonymous?: boolean
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          subject: string
+          submitted_by?: string | null
+          submitted_by_name?: string | null
+          updated_at?: string
+        }
+        Update: {
+          admin_response?: string | null
+          body?: string
+          created_at?: string
+          department?: string | null
+          id?: string
+          is_anonymous?: boolean
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          subject?: string
+          submitted_by?: string | null
+          submitted_by_name?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
