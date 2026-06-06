@@ -34,6 +34,7 @@ export function useAdminToken() {
   useEffect(() => {
     const s = getSession();
     if (!s) { navigate({ to: "/admin/login" }); return; }
+    if (s.role === "staff" && !s.is_super_admin) { navigate({ to: "/staff" }); return; }
     setToken(s.token);
   }, [navigate]);
   return token;
