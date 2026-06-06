@@ -18,10 +18,21 @@ function Page() {
   const qc = useQueryClient();
   const list = useServerFn(adminListBookings);
   const update = useServerFn(adminUpdateBooking);
+  const delFn = useServerFn(adminDeleteBooking);
   const { data } = useQuery({ queryKey: ["admin-bookings", token], queryFn: () => list({ data: { token: token! } }), enabled: !!token });
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<string>("all");
   if (!token) return null;
+
+  const remove = async (id: string, ref: string) => {
+    if (!confirm(`Permanently delete booking ${ref}? This cannot be undone.`)) return;
+    try {
+      await delFn({ data: { token, id } });
+      toast.success("Booking deleted");
+      qc.invalidateQueries({ queryKey: ["admin-bookings"] });
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+  };
+
 
   const rows = (data ?? []).filter((b) => {
     if (filter !== "all" && b.status !== filter) return false;
@@ -69,6 +80,7 @@ function Page() {
                     <button onClick={() => doUpdate(b.id, "rejected")} className="rounded bg-rose-600 px-2 py-1 text-xs text-white">Reject</button>
                     <button onClick={() => doUpdate(b.id, "completed")} className="rounded bg-slate-700 px-2 py-1 text-xs text-white">Complete</button>
                     <a href={`tel:${b.phone}`} className="rounded border px-2 py-1 text-xs">Call</a>
+                    <button onClick={() => remove(b.id, b.reference)} className="inline-flex items-center gap-1 rounded bg-rose-600 px-2 py-1 text-xs text-white"><Trash2 className="h-3 w-3" /> Delete</button>
                   </div>
                 </td>
               </tr>
