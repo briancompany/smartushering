@@ -145,7 +145,7 @@ export const adminRespondGrievance = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ data }) => {
     const me = await requireSession(data.token);
-    const upd: Record<string, unknown> = {};
+    const upd: { status?: "pending" | "in_review" | "resolved"; admin_response?: string; responded_by?: string; responded_at?: string } = {};
     if (data.status) upd.status = data.status;
     if (data.admin_response !== undefined) {
       upd.admin_response = data.admin_response;
