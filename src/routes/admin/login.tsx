@@ -24,7 +24,7 @@ function Page() {
       const res = await login({ data: form });
       setSession(res);
       toast.success("Welcome, " + (res.full_name ?? res.username));
-      navigate({ to: "/admin" });
+      navigate({ to: res.role === "staff" ? "/staff" : "/admin" });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed");
     } finally {

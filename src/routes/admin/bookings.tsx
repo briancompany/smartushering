@@ -5,6 +5,8 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminListBookings, adminUpdateBooking } from "@/lib/admin.functions";
+import { adminDeleteBooking } from "@/lib/phase3.functions";
+import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/bookings")({
   head: () => ({ meta: [{ title: "Bookings — Admin" }] }),
