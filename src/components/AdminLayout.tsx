@@ -1,6 +1,6 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Calendar, DollarSign, Wrench, Image as ImageIcon, MessageSquare, HelpCircle, LogOut, ArrowLeft, Menu, X, Users, ClipboardCheck, FileText, BarChart3, ShieldCheck, Mail, Star, Database, UserCog } from "lucide-react";
+import { LayoutDashboard, Calendar, DollarSign, Wrench, Image as ImageIcon, MessageSquare, HelpCircle, LogOut, ArrowLeft, Menu, X, Users, ClipboardCheck, FileText, BarChart3, ShieldCheck, Mail, Star, Database, UserCog, Megaphone, Package, AlertTriangle } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { getSession, clearSession, canAccess, ROLE_LABELS, type Session } from "@/lib/auth-client";
 
@@ -12,6 +12,9 @@ const NAV: NavItem[] = [
   { to: "/admin/calendar", label: "Calendar", Icon: Calendar, key: "calendar" },
   { to: "/admin/staff", label: "Staff", Icon: Users, key: "staff" },
   { to: "/admin/assignments", label: "Assignments", Icon: ClipboardCheck, key: "assignments" },
+  { to: "/admin/announcements", label: "Announcements", Icon: Megaphone, key: "announcements" },
+  { to: "/admin/grievances", label: "Concerns", Icon: AlertTriangle, key: "grievances" },
+  { to: "/admin/assets", label: "Assets", Icon: Package, key: "assets" },
   { to: "/admin/quotes", label: "Quotes", Icon: FileText, key: "quotes" },
   { to: "/admin/pricing", label: "Pricing", Icon: DollarSign, key: "pricing" },
   { to: "/admin/services", label: "Services", Icon: Wrench, key: "services" },
@@ -31,6 +34,7 @@ export function useAdminToken() {
   useEffect(() => {
     const s = getSession();
     if (!s) { navigate({ to: "/admin/login" }); return; }
+    if (s.role === "staff" && !s.is_super_admin) { navigate({ to: "/staff" }); return; }
     setToken(s.token);
   }, [navigate]);
   return token;
