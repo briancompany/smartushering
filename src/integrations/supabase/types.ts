@@ -43,6 +43,7 @@ export type Database = {
           created_at: string
           created_by: string | null
           department: string | null
+          email: string | null
           full_name: string | null
           id: string
           is_active: boolean
@@ -62,6 +63,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           department?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string
           is_active?: boolean
@@ -81,6 +83,7 @@ export type Database = {
           created_at?: string
           created_by?: string | null
           department?: string | null
+          email?: string | null
           full_name?: string | null
           id?: string
           is_active?: boolean
@@ -135,7 +138,9 @@ export type Database = {
           created_by: string | null
           expires_at: string | null
           id: string
+          is_public: boolean
           priority: string
+          target_department: string | null
           target_value: string | null
           title: string
         }
@@ -146,7 +151,9 @@ export type Database = {
           created_by?: string | null
           expires_at?: string | null
           id?: string
+          is_public?: boolean
           priority?: string
+          target_department?: string | null
           target_value?: string | null
           title: string
         }
@@ -157,7 +164,9 @@ export type Database = {
           created_by?: string | null
           expires_at?: string | null
           id?: string
+          is_public?: boolean
           priority?: string
+          target_department?: string | null
           target_value?: string | null
           title?: string
         }
@@ -174,6 +183,7 @@ export type Database = {
           id: string
           name: string
           notes: string | null
+          status: string
           updated_at: string
         }
         Insert: {
@@ -186,6 +196,7 @@ export type Database = {
           id?: string
           name: string
           notes?: string | null
+          status?: string
           updated_at?: string
         }
         Update: {
@@ -198,6 +209,7 @@ export type Database = {
           id?: string
           name?: string
           notes?: string | null
+          status?: string
           updated_at?: string
         }
         Relationships: []
@@ -911,6 +923,7 @@ export type Database = {
         Args: {
           _created_by: string
           _department: string
+          _email?: string
           _full_name: string
           _is_department_head: boolean
           _password: string
@@ -936,6 +949,7 @@ export type Database = {
         Args: { _identifier: string; _password: string }
         Returns: {
           department: string
+          email: string
           full_name: string
           id: string
           is_department_head: boolean
