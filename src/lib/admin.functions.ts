@@ -332,7 +332,7 @@ export const adminCreateAccount = createServerFn({ method: "POST" })
       _department: data.department || "",
       _is_department_head: data.is_department_head,
       _created_by: admin.id,
-      _email: data.email || null,
+      _email: data.email || undefined,
     });
     if (error) throw new Error(error.message);
     await logAudit({ actor: admin.username, action: "account.create", entity: "admin_user", entity_id: newId as string, diff: { username: data.username, role: data.role } });
