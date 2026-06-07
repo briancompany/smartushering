@@ -167,15 +167,22 @@ function Page() {
             <p className="mt-3 text-sm text-muted-foreground">No assets currently assigned to you.</p>
           ) : (
             <ul className="mt-3 divide-y">
-              {myAssets.map((a) => (
-                <li key={a.id} className="flex items-center justify-between py-2 text-sm">
-                  <div>
-                    <div className="font-medium text-navy">{a.name}</div>
-                    <div className="text-xs text-muted-foreground">{a.asset_code ?? "—"} • {a.category ?? "—"} • {a.assigned_at ? new Date(a.assigned_at).toLocaleDateString() : ""}</div>
-                  </div>
-                  <span className="rounded-full bg-cream px-2 py-0.5 text-xs capitalize">{a.condition}</span>
-                </li>
-              ))}
+              {myAssets.map((a) => {
+                const status = (a.status ?? "assigned") as "assigned" | "returned" | "lost";
+                const badge = status === "lost" ? "bg-rose-100 text-rose-700" : status === "returned" ? "bg-emerald-100 text-emerald-700" : "bg-gold/30 text-navy";
+                return (
+                  <li key={a.id} className="flex items-center justify-between py-2 text-sm">
+                    <div>
+                      <div className="font-medium text-navy">{a.name}</div>
+                      <div className="text-xs text-muted-foreground">{a.asset_code ?? "—"} • {a.category ?? "—"} • {a.assigned_at ? new Date(a.assigned_at).toLocaleDateString() : ""}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="rounded-full bg-cream px-2 py-0.5 text-xs capitalize">{a.condition}</span>
+                      <span className={`rounded-full px-2 py-0.5 text-xs font-semibold uppercase ${badge}`}>{status}</span>
+                    </div>
+                  </li>
+                );
+              })}
             </ul>
           )}
         </section>

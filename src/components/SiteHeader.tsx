@@ -1,6 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { Menu, X, Phone } from "lucide-react";
 import { useState } from "react";
+import { PublicNotificationBell } from "./PublicNotificationBell";
 
 const NAV = [
   { to: "/", label: "Home" },
@@ -48,14 +49,18 @@ export function SiteHeader() {
           <a href="tel:+254112836281" className="flex items-center gap-2 text-sm font-medium text-navy">
             <Phone className="h-4 w-4 text-gold" /> 0112 836 281
           </a>
+          <PublicNotificationBell />
           <Link to="/book" className="rounded-md bg-navy px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90">
             Book Event
           </Link>
         </div>
 
-        <button className="lg:hidden" onClick={() => setOpen((v) => !v)} aria-label="Menu">
-          {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex items-center gap-2 lg:hidden">
+          <PublicNotificationBell />
+          <button onClick={() => setOpen((v) => !v)} aria-label="Menu">
+            {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {open && (
