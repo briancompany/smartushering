@@ -74,7 +74,7 @@ export const adminLogin = createServerFn({ method: "POST" })
         .select("is_active")
         .or(`username.eq.${data.identifier},staff_id.eq.${data.identifier},phone.eq.${data.identifier}`)
         .maybeSingle();
-      if (chk && chk.is_active === false) throw new Error("Not approved. Contact admin.");
+      if (chk && chk.is_active === false) throw new Error("Your account has been deactivated. Contact support at Smartushering@gmail.com or 0113 867 444.");
       throw new Error("Invalid credentials");
     }
     const token = randomToken();
