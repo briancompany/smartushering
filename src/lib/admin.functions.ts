@@ -302,7 +302,7 @@ export const adminListAccounts = createServerFn({ method: "POST" })
     await requireSuperAdmin(data.token);
     const { data: rows } = await supabaseAdmin
       .from("admin_users")
-      .select("id, username, full_name, staff_id, phone, role, department, is_super_admin, is_department_head, is_active, created_at, last_active_at")
+      .select("id, username, full_name, staff_id, phone, email, role, department, is_super_admin, is_department_head, is_active, created_at, last_active_at")
       .order("created_at", { ascending: false });
     return rows ?? [];
   });
