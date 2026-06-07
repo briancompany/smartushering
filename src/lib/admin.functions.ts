@@ -314,6 +314,7 @@ export const adminCreateAccount = createServerFn({ method: "POST" })
     username: z.string().min(3).max(60).regex(/^[a-zA-Z0-9_.-]+$/),
     staff_id: z.string().min(1).max(40).regex(/^[A-Z0-9-]+$/i),
     phone: z.string().min(7).max(20).regex(/^[0-9+\s-]+$/),
+    email: z.string().email().max(160).optional().or(z.literal("")),
     password: z.string().min(8).max(100),
     role: ROLE_ENUM,
     department: z.string().max(80).optional().or(z.literal("")),
@@ -331,6 +332,7 @@ export const adminCreateAccount = createServerFn({ method: "POST" })
       _department: data.department || "",
       _is_department_head: data.is_department_head,
       _created_by: admin.id,
+      _email: data.email || null,
     });
     if (error) throw new Error(error.message);
     await logAudit({ actor: admin.username, action: "account.create", entity: "admin_user", entity_id: newId as string, diff: { username: data.username, role: data.role } });
@@ -345,19 +347,20 @@ export const adminUpdateAccount = createServerFn({ method: "POST" })
     is_department_head: z.boolean().optional(),
     department: z.string().max(80).optional(),
     phone: z.string().max(20).optional(),
+    email: z.string().email().max(160).optional().or(z.literal("")),
     full_name: z.string().max(120).optional(),
     new_password: z.string().min(8).max(100).optional(),
   }).parse(d))
   .handler(async ({ data }) => {
     const admin = await requireSuperAdmin(data.token);
-    const upd: { is_active?: boolean; department?: string; phone?: string; full_name?: string; is_department_head?: boolean } = {};
+    const upd: { is_active?: boolean; department?: string; phone?: string; email?: string | null; full_name?: string; is_department_head?: boolean } = {};
     if (data.is_active !== undefined) upd.is_active = data.is_active;
     if (data.department !== undefined) upd.department = data.department;
     if (data.phone !== undefined) upd.phone = data.phone;
+    if (data.email !== undefined) upd.email = data.email || null;
     if (data.full_name !== undefined) upd.full_name = data.full_name;
 
     if (data.is_department_head === true) {
-      // find role to demote others
       const { data: target } = await supabaseAdmin.from("admin_users").select("role").eq("id", data.id).maybeSingle();
       if (target?.role) {
         await supabaseAdmin.from("admin_users").update({ is_department_head: false }).eq("role", target.role).eq("is_department_head", true);
@@ -368,6 +371,10 @@ export const adminUpdateAccount = createServerFn({ method: "POST" })
     }
 
     if (Object.keys(upd).length > 0) {
+      // Deactivating? Also revoke any active session so they can't keep using a logged-in tab.
+      if (upd.is_active === false) {
+        await supabaseAdmin.from("admin_users").update({ session_token: null, session_expires_at: null, remember_me_until: null }).eq("id", data.id);
+      }
       const { error } = await supabaseAdmin.from("admin_users").update(upd).eq("id", data.id);
       if (error) throw new Error(error.message);
     }

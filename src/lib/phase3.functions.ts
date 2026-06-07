@@ -63,6 +63,8 @@ export const adminUpsertAnnouncement = createServerFn({ method: "POST" })
     audience: z.enum(["all","department","role"]).default("all"),
     target_value: z.string().max(80).optional().or(z.literal("")),
     expires_at: z.string().optional().or(z.literal("")),
+    is_public: z.boolean().default(false),
+    target_department: z.string().max(80).optional().or(z.literal("")),
   }).parse(d))
   .handler(async ({ data }) => {
     const me = await requireSession(data.token);
@@ -70,6 +72,8 @@ export const adminUpsertAnnouncement = createServerFn({ method: "POST" })
       title: data.title, body: data.body, priority: data.priority,
       audience: data.audience, target_value: data.target_value || null,
       expires_at: data.expires_at || null, created_by: me.id,
+      is_public: data.is_public,
+      target_department: data.target_department || null,
     };
     const q = data.id
       ? supabaseAdmin.from("announcements").update(payload).eq("id", data.id)
@@ -78,6 +82,20 @@ export const adminUpsertAnnouncement = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     await logAudit({ actor: me.username, action: data.id ? "announcement.update" : "announcement.create", entity: "announcement", entity_id: data.id ?? null, diff: payload });
     return { ok: true };
+  });
+
+/* Public (anonymous) — non-expired public announcements */
+export const listPublicAnnouncements = createServerFn({ method: "GET" })
+  .handler(async () => {
+    const nowIso = new Date().toISOString();
+    const { data: rows } = await supabaseAdmin
+      .from("announcements")
+      .select("id, title, body, priority, created_at, expires_at")
+      .eq("is_public", true)
+      .or(`expires_at.is.null,expires_at.gt.${nowIso}`)
+      .order("created_at", { ascending: false })
+      .limit(10);
+    return rows ?? [];
   });
 
 export const adminDeleteAnnouncement = createServerFn({ method: "POST" })
@@ -183,6 +201,7 @@ export const adminUpsertAsset = createServerFn({ method: "POST" })
     asset_code: z.string().max(80).optional().or(z.literal("")),
     category: z.string().max(80).optional().or(z.literal("")),
     condition: z.enum(["new","good","fair","damaged","retired"]).default("good"),
+    status: z.enum(["assigned","returned","lost"]).default("assigned"),
     assigned_to: z.string().uuid().nullable().optional(),
     notes: z.string().max(500).optional().or(z.literal("")),
   }).parse(d))
@@ -191,6 +210,7 @@ export const adminUpsertAsset = createServerFn({ method: "POST" })
     const payload = {
       name: data.name, asset_code: data.asset_code || null,
       category: data.category || null, condition: data.condition,
+      status: data.status,
       assigned_to: data.assigned_to || null,
       assigned_at: data.assigned_to ? new Date().toISOString() : null,
       notes: data.notes || null,
@@ -201,6 +221,20 @@ export const adminUpsertAsset = createServerFn({ method: "POST" })
     const { error } = await q;
     if (error) throw new Error(error.message);
     await logAudit({ actor: me.username, action: data.id ? "asset.update" : "asset.create", entity: "asset", entity_id: data.id ?? null, diff: payload });
+    return { ok: true };
+  });
+
+export const adminSetAssetStatus = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({
+    token: z.string(),
+    id: z.string().uuid(),
+    status: z.enum(["assigned","returned","lost"]),
+  }).parse(d))
+  .handler(async ({ data }) => {
+    const me = await requireSession(data.token);
+    const { error } = await supabaseAdmin.from("assets").update({ status: data.status }).eq("id", data.id);
+    if (error) throw new Error(error.message);
+    await logAudit({ actor: me.username, action: "asset.status", entity: "asset", entity_id: data.id, diff: { status: data.status } });
     return { ok: true };
   });
 
