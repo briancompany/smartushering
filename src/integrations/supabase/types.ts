@@ -143,6 +143,7 @@ export type Database = {
           target_department: string | null
           target_value: string | null
           title: string
+          updated_at: string
         }
         Insert: {
           audience?: string
@@ -156,6 +157,7 @@ export type Database = {
           target_department?: string | null
           target_value?: string | null
           title: string
+          updated_at?: string
         }
         Update: {
           audience?: string
@@ -169,6 +171,7 @@ export type Database = {
           target_department?: string | null
           target_value?: string | null
           title?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -880,6 +883,74 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      support_tickets: {
+        Row: {
+          admin_response: string | null
+          category: string
+          created_at: string
+          details: string | null
+          handled_by: string | null
+          id: string
+          is_staff: boolean
+          priority: string
+          resolved_at: string | null
+          status: string
+          subject: string
+          submitter_email: string | null
+          submitter_name: string | null
+          submitter_phone: string | null
+          submitter_username: string | null
+          ticket_no: string
+          updated_at: string
+        }
+        Insert: {
+          admin_response?: string | null
+          category: string
+          created_at?: string
+          details?: string | null
+          handled_by?: string | null
+          id?: string
+          is_staff?: boolean
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject: string
+          submitter_email?: string | null
+          submitter_name?: string | null
+          submitter_phone?: string | null
+          submitter_username?: string | null
+          ticket_no?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_response?: string | null
+          category?: string
+          created_at?: string
+          details?: string | null
+          handled_by?: string | null
+          id?: string
+          is_staff?: boolean
+          priority?: string
+          resolved_at?: string | null
+          status?: string
+          subject?: string
+          submitter_email?: string | null
+          submitter_name?: string | null
+          submitter_phone?: string | null
+          submitter_username?: string | null
+          ticket_no?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "support_tickets_handled_by_fkey"
+            columns: ["handled_by"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       testimonials: {
         Row: {
