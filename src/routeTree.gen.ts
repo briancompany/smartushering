@@ -16,6 +16,7 @@ import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as PricingRouteImport } from './routes/pricing'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as ConcernsRouteImport } from './routes/concerns'
@@ -23,6 +24,7 @@ import { Route as BookRouteImport } from './routes/book'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as AdminWarmupRouteImport } from './routes/admin/warmup'
+import { Route as AdminTicketsRouteImport } from './routes/admin/tickets'
 import { Route as AdminStaffRouteImport } from './routes/admin/staff'
 import { Route as AdminServicesRouteImport } from './routes/admin/services'
 import { Route as AdminReviewsRouteImport } from './routes/admin/reviews'
@@ -81,6 +83,11 @@ const GalleryRoute = GalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FaqRoute = FaqRouteImport.update({
   id: '/faq',
   path: '/faq',
@@ -114,6 +121,11 @@ const AdminIndexRoute = AdminIndexRouteImport.update({
 const AdminWarmupRoute = AdminWarmupRouteImport.update({
   id: '/admin/warmup',
   path: '/admin/warmup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminTicketsRoute = AdminTicketsRouteImport.update({
+  id: '/admin/tickets',
+  path: '/admin/tickets',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminStaffRoute = AdminStaffRouteImport.update({
@@ -233,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/concerns': typeof ConcernsRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/gallery': typeof GalleryRoute
   '/pricing': typeof PricingRoute
   '/reviews': typeof ReviewsRoute
@@ -261,6 +274,7 @@ export interface FileRoutesByFullPath {
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/services': typeof AdminServicesRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/admin/tickets': typeof AdminTicketsRoute
   '/admin/warmup': typeof AdminWarmupRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
@@ -271,6 +285,7 @@ export interface FileRoutesByTo {
   '/concerns': typeof ConcernsRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/gallery': typeof GalleryRoute
   '/pricing': typeof PricingRoute
   '/reviews': typeof ReviewsRoute
@@ -299,6 +314,7 @@ export interface FileRoutesByTo {
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/services': typeof AdminServicesRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/admin/tickets': typeof AdminTicketsRoute
   '/admin/warmup': typeof AdminWarmupRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
@@ -310,6 +326,7 @@ export interface FileRoutesById {
   '/concerns': typeof ConcernsRoute
   '/contact': typeof ContactRoute
   '/faq': typeof FaqRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/gallery': typeof GalleryRoute
   '/pricing': typeof PricingRoute
   '/reviews': typeof ReviewsRoute
@@ -338,6 +355,7 @@ export interface FileRoutesById {
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/services': typeof AdminServicesRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/admin/tickets': typeof AdminTicketsRoute
   '/admin/warmup': typeof AdminWarmupRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
@@ -350,6 +368,7 @@ export interface FileRouteTypes {
     | '/concerns'
     | '/contact'
     | '/faq'
+    | '/forgot-password'
     | '/gallery'
     | '/pricing'
     | '/reviews'
@@ -378,6 +397,7 @@ export interface FileRouteTypes {
     | '/admin/reviews'
     | '/admin/services'
     | '/admin/staff'
+    | '/admin/tickets'
     | '/admin/warmup'
     | '/admin/'
     | '/api/public/hooks/warmup'
@@ -388,6 +408,7 @@ export interface FileRouteTypes {
     | '/concerns'
     | '/contact'
     | '/faq'
+    | '/forgot-password'
     | '/gallery'
     | '/pricing'
     | '/reviews'
@@ -416,6 +437,7 @@ export interface FileRouteTypes {
     | '/admin/reviews'
     | '/admin/services'
     | '/admin/staff'
+    | '/admin/tickets'
     | '/admin/warmup'
     | '/admin'
     | '/api/public/hooks/warmup'
@@ -426,6 +448,7 @@ export interface FileRouteTypes {
     | '/concerns'
     | '/contact'
     | '/faq'
+    | '/forgot-password'
     | '/gallery'
     | '/pricing'
     | '/reviews'
@@ -454,6 +477,7 @@ export interface FileRouteTypes {
     | '/admin/reviews'
     | '/admin/services'
     | '/admin/staff'
+    | '/admin/tickets'
     | '/admin/warmup'
     | '/admin/'
     | '/api/public/hooks/warmup'
@@ -465,6 +489,7 @@ export interface RootRouteChildren {
   ConcernsRoute: typeof ConcernsRoute
   ContactRoute: typeof ContactRoute
   FaqRoute: typeof FaqRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   GalleryRoute: typeof GalleryRoute
   PricingRoute: typeof PricingRoute
   ReviewsRoute: typeof ReviewsRoute
@@ -493,6 +518,7 @@ export interface RootRouteChildren {
   AdminReviewsRoute: typeof AdminReviewsRoute
   AdminServicesRoute: typeof AdminServicesRoute
   AdminStaffRoute: typeof AdminStaffRoute
+  AdminTicketsRoute: typeof AdminTicketsRoute
   AdminWarmupRoute: typeof AdminWarmupRoute
   AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicHooksWarmupRoute: typeof ApiPublicHooksWarmupRoute
@@ -549,6 +575,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/faq': {
       id: '/faq'
       path: '/faq'
@@ -596,6 +629,13 @@ declare module '@tanstack/react-router' {
       path: '/admin/warmup'
       fullPath: '/admin/warmup'
       preLoaderRoute: typeof AdminWarmupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/tickets': {
+      id: '/admin/tickets'
+      path: '/admin/tickets'
+      fullPath: '/admin/tickets'
+      preLoaderRoute: typeof AdminTicketsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/staff': {
@@ -761,6 +801,7 @@ const rootRouteChildren: RootRouteChildren = {
   ConcernsRoute: ConcernsRoute,
   ContactRoute: ContactRoute,
   FaqRoute: FaqRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   GalleryRoute: GalleryRoute,
   PricingRoute: PricingRoute,
   ReviewsRoute: ReviewsRoute,
@@ -789,6 +830,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminReviewsRoute: AdminReviewsRoute,
   AdminServicesRoute: AdminServicesRoute,
   AdminStaffRoute: AdminStaffRoute,
+  AdminTicketsRoute: AdminTicketsRoute,
   AdminWarmupRoute: AdminWarmupRoute,
   AdminIndexRoute: AdminIndexRoute,
   ApiPublicHooksWarmupRoute: ApiPublicHooksWarmupRoute,
