@@ -51,7 +51,10 @@ function Page() {
             </label>
             <button disabled={loading} className="w-full rounded-md bg-navy py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{loading ? "Signing in..." : "Sign in"}</button>
           </form>
-          <p className="mt-4 text-center text-xs text-muted-foreground">Account locked? Contact Smartushering@gmail.com</p>
+          <p className="mt-4 text-center text-xs text-muted-foreground">
+            <Link to="/forgot-password" className="text-navy underline hover:text-gold">Forgot password?</Link>
+            {" · "}Account locked? Contact Smartushering@gmail.com
+          </p>
         </div>
       </div>
     </div>

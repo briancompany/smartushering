@@ -36,7 +36,7 @@ export function clearSession() {
 
 // Role → which top-level nav items are visible
 export const ROLE_NAV: Record<string, string[]> = {
-  super_admin: ["dashboard","analytics","bookings","calendar","staff","assignments","announcements","grievances","assets","quotes","pricing","services","gallery","reviews","chats","messages","faqs","accounts","backups","audit","warmup"],
+  super_admin: ["dashboard","analytics","bookings","calendar","staff","assignments","announcements","grievances","assets","quotes","pricing","services","gallery","reviews","chats","messages","faqs","accounts","backups","audit","warmup","tickets"],
   staff_management: ["dashboard","staff","assignments","accounts","announcements","grievances","assets"],
   bookings_operations: ["dashboard","bookings","calendar","assignments","quotes","pricing","announcements"],
   customer_support: ["dashboard","chats","messages","bookings","announcements","grievances"],
