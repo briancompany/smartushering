@@ -31,7 +31,8 @@ export const submitTicket = createServerFn({ method: "POST" })
     priority: z.enum(PRIORITIES).default("normal"),
   }).parse(d))
   .handler(async ({ data }) => {
-    await checkRateLimit(`ticket:${data.submitter_phone}`, 5, 60 * 60 * 1000);
+    const ok = await checkRateLimit({ bucket: "ticket", identifier: data.submitter_phone, limit: 5, windowSeconds: 60 * 60 });
+    if (!ok) throw new Error("Too many tickets. Please try again later.");
     const { data: row, error } = await supabaseAdmin.from("support_tickets").insert({
       category: data.category,
       subject: data.subject,
@@ -77,7 +78,7 @@ export const adminUpdateTicket = createServerFn({ method: "POST" })
   }).parse(d))
   .handler(async ({ data }) => {
     const admin = await requireAdmin(data.token);
-    const upd: Record<string, unknown> = { handled_by: admin.id };
+    const upd: { handled_by: string; status?: typeof STATUSES[number]; resolved_at?: string; admin_response?: string; priority?: typeof PRIORITIES[number] } = { handled_by: admin.id };
     if (data.status) {
       upd.status = data.status;
       if (data.status === "resolved" || data.status === "closed") upd.resolved_at = new Date().toISOString();
