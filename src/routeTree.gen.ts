@@ -22,6 +22,7 @@ import { Route as ConcernsRouteImport } from './routes/concerns'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as AdminWarmupRouteImport } from './routes/admin/warmup'
 import { Route as AdminStaffRouteImport } from './routes/admin/staff'
 import { Route as AdminServicesRouteImport } from './routes/admin/services'
 import { Route as AdminReviewsRouteImport } from './routes/admin/reviews'
@@ -43,6 +44,7 @@ import { Route as AdminAssetsRouteImport } from './routes/admin/assets'
 import { Route as AdminAnnouncementsRouteImport } from './routes/admin/announcements'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as AdminAccountsRouteImport } from './routes/admin/accounts'
+import { Route as ApiPublicHooksWarmupRouteImport } from './routes/api/public/hooks/warmup'
 
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
@@ -107,6 +109,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminWarmupRoute = AdminWarmupRouteImport.update({
+  id: '/admin/warmup',
+  path: '/admin/warmup',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminStaffRoute = AdminStaffRouteImport.update({
@@ -214,6 +221,11 @@ const AdminAccountsRoute = AdminAccountsRouteImport.update({
   path: '/admin/accounts',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicHooksWarmupRoute = ApiPublicHooksWarmupRouteImport.update({
+  id: '/api/public/hooks/warmup',
+  path: '/api/public/hooks/warmup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -249,7 +261,9 @@ export interface FileRoutesByFullPath {
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/services': typeof AdminServicesRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/admin/warmup': typeof AdminWarmupRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -285,7 +299,9 @@ export interface FileRoutesByTo {
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/services': typeof AdminServicesRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/admin/warmup': typeof AdminWarmupRoute
   '/admin': typeof AdminIndexRoute
+  '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -322,7 +338,9 @@ export interface FileRoutesById {
   '/admin/reviews': typeof AdminReviewsRoute
   '/admin/services': typeof AdminServicesRoute
   '/admin/staff': typeof AdminStaffRoute
+  '/admin/warmup': typeof AdminWarmupRoute
   '/admin/': typeof AdminIndexRoute
+  '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -360,7 +378,9 @@ export interface FileRouteTypes {
     | '/admin/reviews'
     | '/admin/services'
     | '/admin/staff'
+    | '/admin/warmup'
     | '/admin/'
+    | '/api/public/hooks/warmup'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -396,7 +416,9 @@ export interface FileRouteTypes {
     | '/admin/reviews'
     | '/admin/services'
     | '/admin/staff'
+    | '/admin/warmup'
     | '/admin'
+    | '/api/public/hooks/warmup'
   id:
     | '__root__'
     | '/'
@@ -432,7 +454,9 @@ export interface FileRouteTypes {
     | '/admin/reviews'
     | '/admin/services'
     | '/admin/staff'
+    | '/admin/warmup'
     | '/admin/'
+    | '/api/public/hooks/warmup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -469,7 +493,9 @@ export interface RootRouteChildren {
   AdminReviewsRoute: typeof AdminReviewsRoute
   AdminServicesRoute: typeof AdminServicesRoute
   AdminStaffRoute: typeof AdminStaffRoute
+  AdminWarmupRoute: typeof AdminWarmupRoute
   AdminIndexRoute: typeof AdminIndexRoute
+  ApiPublicHooksWarmupRoute: typeof ApiPublicHooksWarmupRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -563,6 +589,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin/warmup': {
+      id: '/admin/warmup'
+      path: '/admin/warmup'
+      fullPath: '/admin/warmup'
+      preLoaderRoute: typeof AdminWarmupRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/staff': {
@@ -712,6 +745,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminAccountsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/hooks/warmup': {
+      id: '/api/public/hooks/warmup'
+      path: '/api/public/hooks/warmup'
+      fullPath: '/api/public/hooks/warmup'
+      preLoaderRoute: typeof ApiPublicHooksWarmupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -749,18 +789,10 @@ const rootRouteChildren: RootRouteChildren = {
   AdminReviewsRoute: AdminReviewsRoute,
   AdminServicesRoute: AdminServicesRoute,
   AdminStaffRoute: AdminStaffRoute,
+  AdminWarmupRoute: AdminWarmupRoute,
   AdminIndexRoute: AdminIndexRoute,
+  ApiPublicHooksWarmupRoute: ApiPublicHooksWarmupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

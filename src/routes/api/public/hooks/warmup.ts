@@ -34,8 +34,9 @@ async function runWarmup(source: "cron" | "manual") {
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     await supabaseAdmin.from("audit_logs").insert({
       action: "system.warmup",
-      entity_type: "system",
-      metadata: { source, total_ms, results },
+      actor: source,
+      entity: "system",
+      diff: { source, total_ms, results },
     });
   } catch { /* audit is best-effort */ }
 
