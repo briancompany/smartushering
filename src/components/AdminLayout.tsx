@@ -1,8 +1,10 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ReactNode } from "react";
 import { LayoutDashboard, Calendar, DollarSign, Wrench, Image as ImageIcon, MessageSquare, HelpCircle, LogOut, ArrowLeft, Menu, X, Users, ClipboardCheck, FileText, BarChart3, ShieldCheck, Mail, Star, Database, UserCog, Megaphone, Package, AlertTriangle, Flame, LifeBuoy } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { getSession, clearSession, canAccess, ROLE_LABELS, type Session } from "@/lib/auth-client";
+import { adminVerify } from "@/lib/admin.functions";
 
 type NavItem = { to: string; label: string; Icon: typeof LayoutDashboard; key: string; exact?: boolean };
 const NAV: NavItem[] = [
@@ -32,13 +34,19 @@ const NAV: NavItem[] = [
 
 export function useAdminToken() {
   const navigate = useNavigate();
+  const verify = useServerFn(adminVerify);
   const [token, setToken] = useState<string | null>(null);
   useEffect(() => {
     const s = getSession();
     if (!s) { navigate({ to: "/admin/login" }); return; }
     if (s.role === "staff" && !s.is_super_admin) { navigate({ to: "/staff" }); return; }
     setToken(s.token);
-  }, [navigate]);
+    // Server-side verify: catches deactivated accounts and expired sessions.
+    verify({ data: { token: s.token } }).catch(() => {
+      clearSession();
+      navigate({ to: "/admin/login" });
+    });
+  }, [navigate, verify]);
   return token;
 }
 
