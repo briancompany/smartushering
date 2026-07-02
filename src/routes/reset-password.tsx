@@ -19,7 +19,7 @@ function Page() {
   const navigate = useNavigate();
   const getCtx = useServerFn(getResetContext);
   const apply = useServerFn(applyPasswordChange);
-  const [ctx, setCtx] = useState<{ ticket_no: string; name: string; username: string | null; expires_at: string } | null>(null);
+  const [ctx, setCtx] = useState<{ ticket_no: string; name: string | null; username: string | null; expires_at: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [pw, setPw] = useState("");
   const [pw2, setPw2] = useState("");
