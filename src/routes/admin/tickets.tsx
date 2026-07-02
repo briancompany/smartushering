@@ -81,6 +81,43 @@ function Page() {
     catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
   };
 
+  const waNumber = (p: string) => (p ?? "").replace(/[^0-9]/g, "").replace(/^0/, "254");
+
+  const genericTicketMessage = (t: { ticket_no: string; submitter_name: string; status: string; subject: string; admin_response: string | null }) => {
+    const trackUrl = `${window.location.origin}/track-ticket`;
+    return `Hi ${t.submitter_name}, update on your Smart Ushering ticket ${t.ticket_no}\n\nSubject: ${t.subject}\nStatus: ${t.status.replace("_"," ")}` +
+      (t.admin_response ? `\n\nResponse:\n${t.admin_response}` : "") +
+      `\n\nTrack any time: ${trackUrl}`;
+  };
+
+  const openTicketWhatsApp = (t: typeof rows[number]) => {
+    const phone = waNumber(t.submitter_phone);
+    if (!phone) return toast.error("No phone on ticket");
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(genericTicketMessage(t))}`, "_blank");
+  };
+
+  const generateAndSend = async () => {
+    if (!openTicket) return;
+    try {
+      const res = await generatePw({ data: { token, id: openTicket.id, origin: window.location.origin } });
+      const msg = `Hi ${res.submitter_name}, your Smart Ushering account has a NEW temporary password.\n\n` +
+        `Username: ${res.username}\n` +
+        `Temporary password: ${res.password}\n` +
+        `Valid until: ${new Date(res.expires_at).toLocaleString()} (24 hours)\n\n` +
+        `Tap the secure link below to set your own password now:\n${res.reset_url}\n\n` +
+        `Ticket ${res.ticket_no}. Do NOT share this message.`;
+      const phone = waNumber(res.phone);
+      window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, "_blank");
+      toast.success("Password generated. WhatsApp opened.");
+      setOpenId(null); invalidate();
+    } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+  };
+
+  const markDone = async (id: string) => {
+    try { await update({ data: { token, id, status: "resolved" } }); toast.success("Marked done"); invalidate(); }
+    catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
+  };
+
   return (
     <AdminLayout>
       <div className="flex flex-wrap items-center justify-between gap-3">
@@ -96,7 +133,7 @@ function Page() {
 
       <div className="mt-6 overflow-x-auto rounded-xl border bg-white">
         <table className="w-full text-sm">
-          <thead className="bg-cream text-left text-xs uppercase text-muted-foreground"><tr>{["Ticket","Category","Subject","Submitter","Priority","Status","Created",""].map((h) => <th key={h} className="px-4 py-3">{h}</th>)}</tr></thead>
+          <thead className="bg-cream text-left text-xs uppercase text-muted-foreground"><tr>{["Ticket","Category","Subject","Submitter","Priority","Status","Created","Actions"].map((h) => <th key={h} className="px-4 py-3">{h}</th>)}</tr></thead>
           <tbody>
             {rows.map((t) => (
               <tr key={t.id} className="border-t hover:bg-cream/50">
@@ -107,7 +144,15 @@ function Page() {
                 <td className="px-4 py-3"><span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase ${priorityBadge(t.priority)}`}>{t.priority}</span></td>
                 <td className="px-4 py-3"><span className={`rounded-full px-2 py-0.5 text-xs font-semibold uppercase ${statusBadge(t.status)}`}>{t.status.replace("_"," ")}</span></td>
                 <td className="px-4 py-3 text-xs text-muted-foreground">{new Date(t.created_at).toLocaleString()}</td>
-                <td className="px-4 py-3"><button onClick={() => remove(t.id)} className="rounded bg-rose-100 p-1.5 text-rose-700"><Trash2 className="h-4 w-4" /></button></td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center gap-1.5">
+                    <button title="WhatsApp update" onClick={() => openTicketWhatsApp(t)} className="rounded bg-[#25D366] p-1.5 text-white hover:opacity-90"><Send className="h-3.5 w-3.5" /></button>
+                    {t.status !== "resolved" && t.status !== "closed" && (
+                      <button title="Mark done" onClick={() => markDone(t.id)} className="rounded bg-emerald-600 px-2 py-1 text-[10px] font-semibold text-white">Done</button>
+                    )}
+                    <button title="Delete" onClick={() => remove(t.id)} className="rounded bg-rose-100 p-1.5 text-rose-700"><Trash2 className="h-3.5 w-3.5" /></button>
+                  </div>
+                </td>
               </tr>
             ))}
             {rows.length === 0 && <tr><td colSpan={8} className="p-6 text-center text-muted-foreground">No tickets.</td></tr>}
@@ -134,16 +179,22 @@ function Page() {
                 <h2 className="font-display text-xl font-semibold text-navy">{openTicket.subject}</h2>
                 <div className="mt-1 text-xs text-muted-foreground capitalize">{openTicket.category.replace("_"," ")} • {openTicket.submitter_name} • {openTicket.submitter_phone}</div>
               </div>
+              <button title="WhatsApp" onClick={() => openTicketWhatsApp(openTicket)} className="rounded-md bg-[#25D366] p-2 text-white"><Send className="h-4 w-4" /></button>
             </div>
             {openTicket.details && <p className="mt-3 whitespace-pre-wrap rounded bg-cream p-3 text-sm">{openTicket.details}</p>}
 
             {openTicket.category === "forgot_password" && (
-              <div className="mt-4 rounded-lg border border-gold bg-gold/10 p-3">
-                <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-navy"><KeyRound className="h-4 w-4" /> Reset password + send via WhatsApp</div>
-                <div className="flex gap-2">
-                  <input type="text" placeholder="New password (min 8 chars)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="flex-1 rounded-md border px-3 py-2 text-sm" />
-                  <button disabled={newPassword.length < 8} onClick={doPasswordReset} className="rounded-md bg-gold px-4 py-2 text-sm font-semibold text-gold-foreground disabled:opacity-50">Reset & WhatsApp</button>
-                </div>
+              <div className="mt-4 space-y-2 rounded-lg border border-gold bg-gold/10 p-3">
+                <div className="flex items-center gap-2 text-sm font-semibold text-navy"><KeyRound className="h-4 w-4" /> Auto-generate temporary password (24 h)</div>
+                <p className="text-xs text-muted-foreground">System creates a strong temporary password + a one-time secure link. Both are sent to the user via WhatsApp. They tap the link to set their own password. Temporary password expires in 24 hours.</p>
+                <button onClick={generateAndSend} className="w-full rounded-md bg-gold px-4 py-2 text-sm font-semibold text-gold-foreground">Generate & Send via WhatsApp</button>
+                <details className="text-xs text-muted-foreground">
+                  <summary className="cursor-pointer">Advanced: manual password</summary>
+                  <div className="mt-2 flex gap-2">
+                    <input type="text" placeholder="Manual password (min 8)" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="flex-1 rounded-md border px-3 py-2" />
+                    <button disabled={newPassword.length < 8} onClick={doPasswordReset} className="rounded-md bg-navy px-4 py-2 text-white disabled:opacity-50">Set & WhatsApp</button>
+                  </div>
+                </details>
               </div>
             )}
 
