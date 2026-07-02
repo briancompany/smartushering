@@ -61,8 +61,10 @@ function Page() {
           <p className="mt-2 text-sm text-muted-foreground">Your reference number is</p>
           <p className="mt-1 font-mono text-lg font-semibold text-navy">{ticketNo}</p>
           <p className="mt-4 text-sm text-muted-foreground">An admin will contact you on WhatsApp at <strong>{form.submitter_phone}</strong> with your new password. Keep this number handy.</p>
-          <Link to="/admin/login" className="mt-6 inline-block rounded-md bg-navy px-6 py-2 text-sm font-semibold text-primary-foreground">Back to sign in</Link>
-        </div>
+          <div className="mt-6 flex flex-col gap-2 sm:flex-row sm:justify-center">
+            <Link to="/track-ticket" className="rounded-md border border-navy px-6 py-2 text-sm font-semibold text-navy">Track ticket</Link>
+            <Link to="/admin/login" className="rounded-md bg-navy px-6 py-2 text-sm font-semibold text-primary-foreground">Back to sign in</Link>
+          </div>
       </div>
     );
   }
