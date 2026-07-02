@@ -35,6 +35,7 @@ function Page() {
   const list = useServerFn(adminListTickets);
   const update = useServerFn(adminUpdateTicket);
   const resetPw = useServerFn(adminResetTicketPassword);
+  const generatePw = useServerFn(adminGenerateTicketPassword);
   const del = useServerFn(adminDeleteTicket);
   const [page, setPage] = useState(1);
   const [statusFilter, setStatusFilter] = useState<typeof STATUSES[number] | "">("");
