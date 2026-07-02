@@ -3,9 +3,9 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Trash2, MessageSquare, KeyRound, ChevronLeft, ChevronRight } from "lucide-react";
+import { Trash2, MessageSquare, KeyRound, ChevronLeft, ChevronRight, Send } from "lucide-react";
 import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
-import { adminListTickets, adminUpdateTicket, adminResetTicketPassword, adminDeleteTicket } from "@/lib/tickets.functions";
+import { adminListTickets, adminUpdateTicket, adminResetTicketPassword, adminGenerateTicketPassword, adminDeleteTicket } from "@/lib/tickets.functions";
 
 export const Route = createFileRoute("/admin/tickets")({
   head: () => ({ meta: [{ title: "Support Tickets — Admin" }] }),

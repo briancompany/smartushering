@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrackTicketRouteImport } from './routes/track-ticket'
 import { Route as TrackRouteImport } from './routes/track'
 import { Route as StaffRouteImport } from './routes/staff'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
@@ -49,6 +50,11 @@ import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 import { Route as AdminAccountsRouteImport } from './routes/admin/accounts'
 import { Route as ApiPublicHooksWarmupRouteImport } from './routes/api/public/hooks/warmup'
 
+const TrackTicketRoute = TrackTicketRouteImport.update({
+  id: '/track-ticket',
+  path: '/track-ticket',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TrackRoute = TrackRouteImport.update({
   id: '/track',
   path: '/track',
@@ -260,6 +266,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/staff': typeof StaffRoute
   '/track': typeof TrackRoute
+  '/track-ticket': typeof TrackTicketRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
@@ -301,6 +308,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/staff': typeof StaffRoute
   '/track': typeof TrackRoute
+  '/track-ticket': typeof TrackTicketRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
@@ -343,6 +351,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/staff': typeof StaffRoute
   '/track': typeof TrackRoute
+  '/track-ticket': typeof TrackTicketRoute
   '/admin/accounts': typeof AdminAccountsRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/announcements': typeof AdminAnnouncementsRoute
@@ -386,6 +395,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/staff'
     | '/track'
+    | '/track-ticket'
     | '/admin/accounts'
     | '/admin/analytics'
     | '/admin/announcements'
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/staff'
     | '/track'
+    | '/track-ticket'
     | '/admin/accounts'
     | '/admin/analytics'
     | '/admin/announcements'
@@ -468,6 +479,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/staff'
     | '/track'
+    | '/track-ticket'
     | '/admin/accounts'
     | '/admin/analytics'
     | '/admin/announcements'
@@ -510,6 +522,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   StaffRoute: typeof StaffRoute
   TrackRoute: typeof TrackRoute
+  TrackTicketRoute: typeof TrackTicketRoute
   AdminAccountsRoute: typeof AdminAccountsRoute
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminAnnouncementsRoute: typeof AdminAnnouncementsRoute
@@ -539,6 +552,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/track-ticket': {
+      id: '/track-ticket'
+      path: '/track-ticket'
+      fullPath: '/track-ticket'
+      preLoaderRoute: typeof TrackTicketRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/track': {
       id: '/track'
       path: '/track'
@@ -830,6 +850,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   StaffRoute: StaffRoute,
   TrackRoute: TrackRoute,
+  TrackTicketRoute: TrackTicketRoute,
   AdminAccountsRoute: AdminAccountsRoute,
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminAnnouncementsRoute: AdminAnnouncementsRoute,
