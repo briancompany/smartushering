@@ -50,6 +50,7 @@ export type Database = {
           is_department_head: boolean
           is_super_admin: boolean
           last_active_at: string | null
+          must_change_password: boolean
           password: string
           phone: string | null
           remember_me_until: string | null
@@ -57,6 +58,7 @@ export type Database = {
           session_expires_at: string | null
           session_token: string | null
           staff_id: string | null
+          temp_password_expires_at: string | null
           username: string
         }
         Insert: {
@@ -70,6 +72,7 @@ export type Database = {
           is_department_head?: boolean
           is_super_admin?: boolean
           last_active_at?: string | null
+          must_change_password?: boolean
           password: string
           phone?: string | null
           remember_me_until?: string | null
@@ -77,6 +80,7 @@ export type Database = {
           session_expires_at?: string | null
           session_token?: string | null
           staff_id?: string | null
+          temp_password_expires_at?: string | null
           username: string
         }
         Update: {
@@ -90,6 +94,7 @@ export type Database = {
           is_department_head?: boolean
           is_super_admin?: boolean
           last_active_at?: string | null
+          must_change_password?: boolean
           password?: string
           phone?: string | null
           remember_me_until?: string | null
@@ -97,6 +102,7 @@ export type Database = {
           session_expires_at?: string | null
           session_token?: string | null
           staff_id?: string | null
+          temp_password_expires_at?: string | null
           username?: string
         }
         Relationships: []
@@ -594,6 +600,7 @@ export type Database = {
           id: string
           link: string | null
           read_at: string | null
+          target_user_id: string | null
           title: string
           type: string
         }
@@ -605,6 +612,7 @@ export type Database = {
           id?: string
           link?: string | null
           read_at?: string | null
+          target_user_id?: string | null
           title: string
           type: string
         }
@@ -616,10 +624,19 @@ export type Database = {
           id?: string
           link?: string | null
           read_at?: string | null
+          target_user_id?: string | null
           title?: string
           type?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "notifications_target_user_id_fkey"
+            columns: ["target_user_id"]
+            isOneToOne: false
+            referencedRelation: "admin_users"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       pricing_packages: {
         Row: {
@@ -894,6 +911,9 @@ export type Database = {
           id: string
           is_staff: boolean
           priority: string
+          reset_token: string | null
+          reset_token_expires_at: string | null
+          reset_used_at: string | null
           resolved_at: string | null
           status: string
           subject: string
@@ -913,6 +933,9 @@ export type Database = {
           id?: string
           is_staff?: boolean
           priority?: string
+          reset_token?: string | null
+          reset_token_expires_at?: string | null
+          reset_used_at?: string | null
           resolved_at?: string | null
           status?: string
           subject: string
@@ -932,6 +955,9 @@ export type Database = {
           id?: string
           is_staff?: boolean
           priority?: string
+          reset_token?: string | null
+          reset_token_expires_at?: string | null
+          reset_used_at?: string | null
           resolved_at?: string | null
           status?: string
           subject?: string

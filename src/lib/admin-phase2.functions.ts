@@ -34,7 +34,7 @@ export const adminListNotifications = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     await requireAdmin(data.token);
     const { data: rows } = await supabaseAdmin
-      .from("notifications").select("*").order("created_at", { ascending: false }).limit(50);
+      .from("notifications").select("*").is("target_user_id", null).order("created_at", { ascending: false }).limit(50);
     return rows ?? [];
   });
 
