@@ -320,3 +320,47 @@ export const clientTrackBooking = createServerFn({ method: "POST" })
     void _phone;
     return safe;
   });
+
+/* ---------------- Staff notifications ---------------- */
+export const staffListNotifications = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ token: z.string() }).parse(d))
+  .handler(async ({ data }) => {
+    const me = await requireSession(data.token);
+    const { data: rows } = await supabaseAdmin
+      .from("notifications")
+      .select("id, type, title, body, link, read_at, created_at")
+      .eq("target_user_id", me.id)
+      .order("created_at", { ascending: false })
+      .limit(50);
+    return rows ?? [];
+  });
+
+export const staffMarkNotificationsRead = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ token: z.string(), id: z.string().uuid().optional() }).parse(d))
+  .handler(async ({ data }) => {
+    const me = await requireSession(data.token);
+    const q = supabaseAdmin.from("notifications")
+      .update({ read_at: new Date().toISOString() })
+      .eq("target_user_id", me.id).is("read_at", null);
+    if (data.id) await q.eq("id", data.id); else await q;
+    return { ok: true };
+  });
+
+/* Admin sends personal feedback notification to a specific staff */
+export const adminSendStaffNotification = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({
+    token: z.string(),
+    target_user_id: z.string().uuid(),
+    title: z.string().min(1).max(200),
+    body: z.string().max(2000).optional(),
+    link: z.string().max(200).optional(),
+  }).parse(d))
+  .handler(async ({ data }) => {
+    const me = await requireSession(data.token);
+    await supabaseAdmin.from("notifications").insert({
+      type: "feedback", title: data.title, body: data.body ?? null,
+      link: data.link ?? "/staff", target_user_id: data.target_user_id,
+    });
+    await logAudit({ actor: me.username, action: "notification.send", entity: "admin_user", entity_id: data.target_user_id, diff: { title: data.title } });
+    return { ok: true };
+  });
