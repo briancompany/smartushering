@@ -81,11 +81,11 @@ function Page() {
     catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
   };
 
-  const waNumber = (p: string) => (p ?? "").replace(/[^0-9]/g, "").replace(/^0/, "254");
+  const waNumber = (p: string | null | undefined) => (p ?? "").replace(/[^0-9]/g, "").replace(/^0/, "254");
 
-  const genericTicketMessage = (t: { ticket_no: string; submitter_name: string; status: string; subject: string; admin_response: string | null }) => {
+  const genericTicketMessage = (t: { ticket_no: string; submitter_name: string | null; status: string; subject: string; admin_response: string | null }) => {
     const trackUrl = `${window.location.origin}/track-ticket`;
-    return `Hi ${t.submitter_name}, update on your Smart Ushering ticket ${t.ticket_no}\n\nSubject: ${t.subject}\nStatus: ${t.status.replace("_"," ")}` +
+    return `Hi ${t.submitter_name ?? "there"}, update on your Smart Ushering ticket ${t.ticket_no}\n\nSubject: ${t.subject}\nStatus: ${t.status.replace("_"," ")}` +
       (t.admin_response ? `\n\nResponse:\n${t.admin_response}` : "") +
       `\n\nTrack any time: ${trackUrl}`;
   };
