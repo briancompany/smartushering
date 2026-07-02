@@ -65,6 +65,7 @@ function Page() {
             <Link to="/track-ticket" className="rounded-md border border-navy px-6 py-2 text-sm font-semibold text-navy">Track ticket</Link>
             <Link to="/admin/login" className="rounded-md bg-navy px-6 py-2 text-sm font-semibold text-primary-foreground">Back to sign in</Link>
           </div>
+        </div>
       </div>
     );
   }
