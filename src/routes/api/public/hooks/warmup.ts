@@ -2,7 +2,7 @@
 // Touches the DB and key server modules so cold Workers stay warm.
 import { createFileRoute } from "@tanstack/react-router";
 
-async function runWarmup(source: "cron" | "manual") {
+async function runWarmup(source: "cron" | "manual", origin: string) {
   const started = Date.now();
   const results: Record<string, { ok: boolean; ms: number; error?: string }> = {};
 
