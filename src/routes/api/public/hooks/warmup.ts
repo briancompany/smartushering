@@ -73,10 +73,6 @@ async function runWarmup(source: "cron" | "manual", origin: string) {
 
   // ---- SSR: hit the homepage to warm the React SSR pipeline + route tree ----
   await time("ssr.homepage", async () => {
-    const { origin } = new URL(
-      (globalThis as { location?: { href?: string } }).location?.href ??
-        "https://smartushering.lovable.app/",
-    );
     const res = await fetch(`${origin}/?warmup=1`, {
       headers: { "user-agent": "smart-ushering-warmup/1.0" },
     });
