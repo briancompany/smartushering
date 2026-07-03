@@ -98,11 +98,13 @@ async function runWarmup(source: "cron" | "manual", origin: string) {
 export const Route = createFileRoute("/api/public/hooks/warmup")({
   server: {
     handlers: {
-      GET: async () => Response.json(await runWarmup("cron")),
+      GET: async ({ request }) =>
+        Response.json(await runWarmup("cron", new URL(request.url).origin)),
       POST: async ({ request }) => {
+        const origin = new URL(request.url).origin;
         let source: "cron" | "manual" = "cron";
         try { const b = await request.json() as { source?: "cron" | "manual" }; if (b?.source === "manual") source = "manual"; } catch { /* empty body ok */ }
-        return Response.json(await runWarmup(source));
+        return Response.json(await runWarmup(source, origin));
       },
     },
   },
