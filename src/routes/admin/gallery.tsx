@@ -33,10 +33,10 @@ function Page() {
     if (!file) return toast.error("Choose an image");
     setUploading(true);
     try {
-      const path = `gallery/${Date.now()}-${file.name}`;
-      const { error: upErr } = await supabase.storage.from("chat-uploads").upload(path, file);
+      const path = `${Date.now()}-${file.name}`;
+      const { error: upErr } = await supabase.storage.from("gallery").upload(path, file);
       if (upErr) throw upErr;
-      const { data: signed } = await supabase.storage.from("chat-uploads").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
+      const { data: signed } = await supabase.storage.from("gallery").createSignedUrl(path, 60 * 60 * 24 * 365 * 10);
       if (!signed) throw new Error("Failed to get URL");
       await add({ data: { token, category: form.category, image_url: signed.signedUrl, caption: form.caption || undefined, display_order: 0 } });
       toast.success("Uploaded");
