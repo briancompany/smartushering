@@ -231,7 +231,26 @@ CREATE POLICY "Anyone insert messages" ON public.chat_messages FOR INSERT TO ano
 ALTER PUBLICATION supabase_realtime ADD TABLE public.chat_messages;
 ALTER PUBLICATION supabase_realtime ADD TABLE public.chat_conversations;
 
--- chat images storage bucket created via tool separately
+-- ============================================================
+-- STORAGE BUCKETS (all buckets the app uses — idempotent)
+-- Run this whole file in the SQL Editor; these inserts create
+-- every bucket so no feature ever hits "bucket not found".
+-- ============================================================
+INSERT INTO storage.buckets (id, name, public, file_size_limit)
+VALUES
+  ('chat-uploads', 'chat-uploads', false, 10485760),  -- 10MB, chat + visitor images
+  ('gallery', 'gallery', false, 10485760),            -- 10MB, public gallery photos
+  ('quotes', 'quotes', false, 20971520),              -- 20MB, generated PDF quotes
+  ('backups', 'backups', false, NULL)                 -- admin JSON backup snapshots
+ON CONFLICT (id) DO NOTHING;
+
+-- Gallery bucket access (admin panel uploads via its own login)
+CREATE POLICY "Anyone can upload gallery images" ON storage.objects FOR INSERT TO anon, authenticated
+  WITH CHECK (bucket_id = 'gallery');
+CREATE POLICY "Anyone can read gallery images" ON storage.objects FOR SELECT TO anon, authenticated
+  USING (bucket_id = 'gallery');
+CREATE POLICY "Anyone can delete gallery images" ON storage.objects FOR DELETE TO anon, authenticated
+  USING (bucket_id = 'gallery');
 
 -- ============================================================
 -- 20260602085515_198d2bf2-bb1e-4766-93c2-eb2e8f2f2851.sql
