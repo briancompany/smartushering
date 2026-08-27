@@ -77,32 +77,61 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
   y -= 10;
 
   // Cost table
-  page.drawRectangle({ x: 40, y: y - 4, width: 515, height: 22, color: navy });
-  page.drawText("Description", { x: 50, y: y + 4, size: 10, font: bold, color: rgb(1, 1, 1) });
-  page.drawText("Qty", { x: 320, y: y + 4, size: 10, font: bold, color: rgb(1, 1, 1) });
-  page.drawText("Rate", { x: 380, y: y + 4, size: 10, font: bold, color: rgb(1, 1, 1) });
-  page.drawText("Amount (KES)", { x: 460, y: y + 4, size: 10, font: bold, color: rgb(1, 1, 1) });
-  y -= 24;
+  const COL_DESC = 48;
+  const COL_QTY_R = 372;   // right edge of Qty column
+  const COL_RATE_R = 455;  // right edge of Rate column
+  const COL_AMT_R = 547;   // right edge of Amount column
+  const right = (text: string, xRight: number, size: number, f = font, color = navy, yy = y) =>
+    page.drawText(text, { x: xRight - f.widthOfTextAtSize(text, size), y: yy, size, font: f, color });
 
-  const qtyLabel = `${q.number_of_ushers} x ${days}d`;
+  page.drawRectangle({ x: 40, y: y - 6, width: 515, height: 26, color: navy });
+  page.drawText("Description", { x: COL_DESC + 2, y: y + 3, size: 9, font: bold, color: rgb(1, 1, 1) });
+  right("Ushers x Days", COL_QTY_R, 9, bold, rgb(1, 1, 1), y + 3);
+  right("Rate / usher / day", COL_RATE_R, 9, bold, rgb(1, 1, 1), y + 3);
+  right("Amount (KES)", COL_AMT_R, 9, bold, rgb(1, 1, 1), y + 3);
+  y -= 30;
+
+  const qtyLabel = `${q.number_of_ushers} x ${days}`;
   const rows = [
-    { d: `${q.package_name} package – ushering services (per usher/day)`, qty: qtyLabel, rate: q.package_price_kes, amt: subtotal },
-    { d: "Transport (per usher/day)", qty: qtyLabel, rate: q.transport_rate_kes, amt: q.transport_kes },
+    {
+      d: `${q.package_name} package - professional ushering services`,
+      sub: `${q.number_of_ushers} usher${q.number_of_ushers > 1 ? "s" : ""} x ${days} day${days > 1 ? "s" : ""} x KES ${q.package_price_kes.toLocaleString()} per usher per day`,
+      rate: q.package_price_kes,
+      amt: subtotal,
+    },
+    {
+      d: "Transport allowance",
+      sub: `${q.number_of_ushers} usher${q.number_of_ushers > 1 ? "s" : ""} x ${days} day${days > 1 ? "s" : ""} x KES ${q.transport_rate_kes.toLocaleString()} per usher per day`,
+      rate: q.transport_rate_kes,
+      amt: q.transport_kes,
+    },
   ];
   for (const r of rows) {
-    page.drawText(r.d, { x: 50, y, size: 10, font, color: navy });
-    page.drawText(String(r.qty), { x: 320, y, size: 10, font, color: navy });
-    page.drawText(r.rate.toLocaleString(), { x: 380, y, size: 10, font, color: navy });
-    page.drawText(r.amt.toLocaleString(), { x: 460, y, size: 10, font, color: navy });
-    y -= 18;
+    page.drawText(r.d, { x: COL_DESC + 2, y, size: 10, font: bold, color: navy, maxWidth: 250 });
+    right(qtyLabel, COL_QTY_R, 10, font, navy, y);
+    right(r.rate.toLocaleString(), COL_RATE_R, 10, font, navy, y);
+    right(r.amt.toLocaleString(), COL_AMT_R, 10, bold, navy, y);
+    y -= 13;
+    page.drawText(r.sub, { x: COL_DESC + 2, y, size: 8, font, color: gray, maxWidth: 300 });
+    y -= 12;
+    page.drawLine({ start: { x: 40, y }, end: { x: 555, y }, color: rgb(0.88, 0.88, 0.9), thickness: 0.5 });
+    y -= 14;
   }
 
-  y -= 10;
-  page.drawLine({ start: { x: 320, y }, end: { x: 555, y }, color: gray, thickness: 0.5 });
-  y -= 16;
-  page.drawText("TOTAL", { x: 380, y, size: 12, font: bold, color: navy });
-  page.drawText(`KES ${total.toLocaleString()}`, { x: 460, y, size: 12, font: bold, color: gold });
-  y -= 30;
+  y -= 2;
+  page.drawText("Subtotal (ushering)", { x: 300, y, size: 10, font, color: gray });
+  right(`KES ${subtotal.toLocaleString()}`, COL_AMT_R, 10, font, navy, y);
+  y -= 15;
+  page.drawText("Transport total", { x: 300, y, size: 10, font, color: gray });
+  right(`KES ${q.transport_kes.toLocaleString()}`, COL_AMT_R, 10, font, navy, y);
+  y -= 12;
+  page.drawLine({ start: { x: 300, y }, end: { x: 555, y }, color: gray, thickness: 0.5 });
+  y -= 22;
+  page.drawRectangle({ x: 300, y: y - 8, width: 255, height: 26, color: navy });
+  page.drawText("TOTAL", { x: 312, y, size: 12, font: bold, color: rgb(1, 1, 1) });
+  right(`KES ${total.toLocaleString()}`, COL_AMT_R, 12, bold, gold, y);
+  y -= 34;
+
 
   if (q.notes) {
     page.drawText("Notes:", { x: 40, y, size: 10, font: bold, color: navy }); y -= 14;
