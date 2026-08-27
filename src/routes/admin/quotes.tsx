@@ -20,14 +20,22 @@ function Page() {
   const getUrl = useServerFn(adminGetQuoteUrl);
   const { data = [] } = useQuery({ queryKey: ["quotes", token], queryFn: () => list({ data: { token: token! } }), enabled: !!token });
   const { data: pkgs = [] } = useQuery({ queryKey: ["pkgs-q"], queryFn: async () => (await supabase.from("pricing_packages").select("*").order("display_order")).data ?? [] });
-  const [form, setForm] = useState({ customer_name: "", customer_email: "", customer_phone: "", event_type: "Wedding", event_date: "", venue: "", county: "Nairobi", package_slug: "", number_of_ushers: 4, transport_kes: 800, notes: "" });
+  const [form, setForm] = useState({ customer_name: "", customer_email: "", customer_phone: "", event_type: "Wedding", venue: "", county: "Nairobi", package_slug: "", number_of_ushers: 4, transport_rate_kes: 300, validity_days: 14, notes: "" });
+  const [dates, setDates] = useState<string[]>([""]);
   if (!token) return null;
   if (!form.package_slug && pkgs[0]) setForm((f) => ({ ...f, package_slug: pkgs[0].slug }));
+
+  const cleanDates = Array.from(new Set(dates.filter(Boolean))).sort();
+  const days = Math.max(1, cleanDates.length);
+  const pkg = pkgs.find((p) => p.slug === form.package_slug);
+  const subtotal = (pkg?.price_kes ?? 0) * form.number_of_ushers * days;
+  const transportTotal = form.transport_rate_kes * form.number_of_ushers * days;
+  const total = subtotal + transportTotal;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const r = await create({ data: { token, ...form } });
+      const r = await create({ data: { token, ...form, event_dates: cleanDates, number_of_days: days, event_date: cleanDates[0] ?? "" } });
       toast.success(`Quote ${r.reference} created`);
       qc.invalidateQueries({ queryKey: ["quotes"] });
       if (r.signedUrl) window.open(r.signedUrl, "_blank");
