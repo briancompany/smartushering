@@ -56,7 +56,18 @@ function Page() {
         <input required type="email" placeholder="Customer email" value={form.customer_email} onChange={(e) => setForm({ ...form, customer_email: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <input placeholder="Phone" value={form.customer_phone} onChange={(e) => setForm({ ...form, customer_phone: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <input required placeholder="Event type" value={form.event_type} onChange={(e) => setForm({ ...form, event_type: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
-        <input type="date" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
+        <div className="sm:col-span-3 rounded-md border bg-cream/50 p-3">
+          <div className="mb-2 text-xs font-semibold text-navy">Event dates — add one row per day the event runs ({days} day{days > 1 ? "s" : ""})</div>
+          <div className="flex flex-wrap gap-2">
+            {dates.map((d, i) => (
+              <div key={i} className="flex items-center gap-1">
+                <input type="date" value={d} onChange={(e) => setDates(dates.map((x, j) => (j === i ? e.target.value : x)))} className="rounded-md border px-3 py-2 text-sm" />
+                {dates.length > 1 && <button type="button" onClick={() => setDates(dates.filter((_, j) => j !== i))} className="rounded border px-2 py-1 text-xs">✕</button>}
+              </div>
+            ))}
+            <button type="button" onClick={() => setDates([...dates, ""])} className="rounded-md border border-navy px-3 py-2 text-xs font-semibold text-navy">+ Add day</button>
+          </div>
+        </div>
         <input placeholder="Venue" value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <input placeholder="County" value={form.county} onChange={(e) => setForm({ ...form, county: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <select value={form.package_slug} onChange={(e) => setForm({ ...form, package_slug: e.target.value })} className="rounded-md border px-3 py-2 text-sm">
