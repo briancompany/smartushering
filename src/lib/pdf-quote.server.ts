@@ -56,9 +56,14 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
   y -= 8;
 
   // Event details
+  const dateList = (q.event_dates ?? []).filter(Boolean);
+  const datesLabel = dateList.length
+    ? dateList.join(", ").slice(0, 90)
+    : (q.event_date ?? "TBD");
   const lines: Array<[string, string]> = [
     ["Event Type", q.event_type],
-    ["Event Date", q.event_date ?? "TBD"],
+    [dateList.length > 1 ? "Event Dates" : "Event Date", datesLabel],
+    ["Duration", `${days} day${days > 1 ? "s" : ""}`],
     ["Venue", q.venue ?? "TBD"],
     ["County", q.county ?? "TBD"],
     ["Package", q.package_name],
