@@ -84,9 +84,10 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
   page.drawText("Amount (KES)", { x: 460, y: y + 4, size: 10, font: bold, color: rgb(1, 1, 1) });
   y -= 24;
 
+  const qtyLabel = `${q.number_of_ushers} x ${days}d`;
   const rows = [
-    { d: `${q.package_name} package – ushering services`, qty: q.number_of_ushers, rate: q.package_price_kes, amt: subtotal },
-    { d: "Transport (host pays)", qty: q.number_of_ushers, rate: q.transport_kes ? Math.round(q.transport_kes / q.number_of_ushers) : 0, amt: q.transport_kes },
+    { d: `${q.package_name} package – ushering services (per usher/day)`, qty: qtyLabel, rate: q.package_price_kes, amt: subtotal },
+    { d: "Transport (per usher/day)", qty: qtyLabel, rate: q.transport_rate_kes, amt: q.transport_kes },
   ];
   for (const r of rows) {
     page.drawText(r.d, { x: 50, y, size: 10, font, color: navy });
