@@ -98,7 +98,7 @@ function Page() {
               <tr key={q.id} className="border-t">
                 <td className="px-4 py-3 font-mono text-xs">{q.reference}</td>
                 <td className="px-4 py-3">{q.customer_name}<div className="text-xs text-muted-foreground">{q.customer_email}</div></td>
-                <td className="px-4 py-3">{q.event_type} <div className="text-xs text-muted-foreground">{q.event_date ?? "TBD"}</div></td>
+                <td className="px-4 py-3">{q.event_type} <div className="text-xs text-muted-foreground">{(q.event_dates?.length ? q.event_dates.join(", ") : q.event_date) ?? "TBD"} • {q.number_of_days ?? 1}d</div></td>
                 <td className="px-4 py-3">{q.number_of_ushers}</td>
                 <td className="px-4 py-3 font-semibold">KES {q.total_kes.toLocaleString()}</td>
                 <td className="px-4 py-3 text-xs">{new Date(q.created_at).toLocaleDateString()}</td>
