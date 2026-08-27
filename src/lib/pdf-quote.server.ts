@@ -111,7 +111,12 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
   }
 
   page.drawText("Host provides lunch for all ushers. Transport billed separately.", { x: 40, y: 80, size: 9, font, color: gray });
-  page.drawText("Quote valid for 14 days. Confirm by replying to this email or call 0112 836 281.", { x: 40, y: 66, size: 9, font, color: gray });
+  page.drawText(
+    q.valid_until
+      ? `Quote valid until ${q.valid_until}. Confirm by replying to this email or call 0112 836 281.`
+      : "Confirm by replying to this email or call 0112 836 281.",
+    { x: 40, y: 66, size: 9, font, color: gray },
+  );
   page.drawText("Smart Ushering • Nairobi, Kenya", { x: 40, y: 40, size: 8, font, color: gray });
 
   const bytes = await pdf.save();
