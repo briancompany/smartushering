@@ -15,7 +15,6 @@ async function requireAdmin(token: string) {
   if (data.session_expires_at && new Date(data.session_expires_at) < new Date()) {
     throw new Error("Session expired. Please log in again.");
   }
-  // sliding session: extend on each call
   await supabaseAdmin
     .from("admin_users")
     .update({
@@ -166,7 +165,6 @@ export const adminCreateQuote = createServerFn({ method: "POST" })
     county: z.string().max(120).optional(),
     package_slug: z.string().max(60),
     number_of_ushers: z.number().int().min(1).max(500),
-    /** Transport per usher, per day */
     transport_rate_kes: z.number().int().min(0).max(1000000).default(0),
     notes: z.string().max(1000).optional(),
   }).parse(d))
@@ -231,6 +229,25 @@ export const adminGetQuoteUrl = createServerFn({ method: "POST" })
     if (!q?.pdf_path) throw new Error("PDF not found");
     const { data: signed } = await supabaseAdmin.storage.from("quotes").createSignedUrl(q.pdf_path, 60 * 60);
     return { signedUrl: signed?.signedUrl ?? "" };
+  });
+
+/* ---------------- Public: get quote by reference (no auth) ---------------- */
+export const getQuoteByReference = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ reference: z.string().min(1).max(30) }).parse(d))
+  .handler(async ({ data }) => {
+    const { data: q, error } = await supabaseAdmin
+      .from("quotes")
+      .select("reference, customer_name, event_type, event_date, event_dates, number_of_days, venue, county, package_name, number_of_ushers, package_price_kes, transport_rate_kes, transport_kes, subtotal_kes, total_kes, valid_until, notes, pdf_path, created_at")
+      .eq("reference", data.reference)
+      .maybeSingle();
+    if (error || !q) throw new Error("Quote not found");
+    // Generate a fresh signed URL for the PDF
+    let pdfUrl: string | null = null;
+    if (q.pdf_path) {
+      const { data: signed } = await supabaseAdmin.storage.from("quotes").createSignedUrl(q.pdf_path, 60 * 60 * 24);
+      pdfUrl = signed?.signedUrl ?? null;
+    }
+    return { ...q, pdfUrl };
   });
 
 /* ---------------- Analytics ---------------- */
