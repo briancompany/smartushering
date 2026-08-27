@@ -7,7 +7,7 @@ import { Download, MessageCircle, X } from "lucide-react";
 import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminListQuotes, adminCreateQuote, adminGetQuoteUrl } from "@/lib/admin-phase2.functions";
 import { supabase } from "@/integrations/supabase/client";
-
+ 
 const DEFAULT_WA = "254112836281";
 
 export const Route = createFileRoute("/admin/quotes")({
