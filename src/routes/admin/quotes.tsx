@@ -20,14 +20,22 @@ function Page() {
   const getUrl = useServerFn(adminGetQuoteUrl);
   const { data = [] } = useQuery({ queryKey: ["quotes", token], queryFn: () => list({ data: { token: token! } }), enabled: !!token });
   const { data: pkgs = [] } = useQuery({ queryKey: ["pkgs-q"], queryFn: async () => (await supabase.from("pricing_packages").select("*").order("display_order")).data ?? [] });
-  const [form, setForm] = useState({ customer_name: "", customer_email: "", customer_phone: "", event_type: "Wedding", event_date: "", venue: "", county: "Nairobi", package_slug: "", number_of_ushers: 4, transport_kes: 800, notes: "" });
+  const [form, setForm] = useState({ customer_name: "", customer_email: "", customer_phone: "", event_type: "Wedding", venue: "", county: "Nairobi", package_slug: "", number_of_ushers: 4, transport_rate_kes: 300, validity_days: 14, notes: "" });
+  const [dates, setDates] = useState<string[]>([""]);
   if (!token) return null;
   if (!form.package_slug && pkgs[0]) setForm((f) => ({ ...f, package_slug: pkgs[0].slug }));
+
+  const cleanDates = Array.from(new Set(dates.filter(Boolean))).sort();
+  const days = Math.max(1, cleanDates.length);
+  const pkg = pkgs.find((p) => p.slug === form.package_slug);
+  const subtotal = (pkg?.price_kes ?? 0) * form.number_of_ushers * days;
+  const transportTotal = form.transport_rate_kes * form.number_of_ushers * days;
+  const total = subtotal + transportTotal;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const r = await create({ data: { token, ...form } });
+      const r = await create({ data: { token, ...form, event_dates: cleanDates, number_of_days: days, event_date: cleanDates[0] ?? "" } });
       toast.success(`Quote ${r.reference} created`);
       qc.invalidateQueries({ queryKey: ["quotes"] });
       if (r.signedUrl) window.open(r.signedUrl, "_blank");
@@ -48,15 +56,37 @@ function Page() {
         <input required type="email" placeholder="Customer email" value={form.customer_email} onChange={(e) => setForm({ ...form, customer_email: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <input placeholder="Phone" value={form.customer_phone} onChange={(e) => setForm({ ...form, customer_phone: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <input required placeholder="Event type" value={form.event_type} onChange={(e) => setForm({ ...form, event_type: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
-        <input type="date" value={form.event_date} onChange={(e) => setForm({ ...form, event_date: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
+        <div className="sm:col-span-3 rounded-md border bg-cream/50 p-3">
+          <div className="mb-2 text-xs font-semibold text-navy">Event dates — add one row per day the event runs ({days} day{days > 1 ? "s" : ""})</div>
+          <div className="flex flex-wrap gap-2">
+            {dates.map((d, i) => (
+              <div key={i} className="flex items-center gap-1">
+                <input type="date" value={d} onChange={(e) => setDates(dates.map((x, j) => (j === i ? e.target.value : x)))} className="rounded-md border px-3 py-2 text-sm" />
+                {dates.length > 1 && <button type="button" onClick={() => setDates(dates.filter((_, j) => j !== i))} className="rounded border px-2 py-1 text-xs">✕</button>}
+              </div>
+            ))}
+            <button type="button" onClick={() => setDates([...dates, ""])} className="rounded-md border border-navy px-3 py-2 text-xs font-semibold text-navy">+ Add day</button>
+          </div>
+        </div>
         <input placeholder="Venue" value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <input placeholder="County" value={form.county} onChange={(e) => setForm({ ...form, county: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <select value={form.package_slug} onChange={(e) => setForm({ ...form, package_slug: e.target.value })} className="rounded-md border px-3 py-2 text-sm">
           {pkgs.map((p) => <option key={p.slug} value={p.slug}>{p.name} — KES {p.price_kes.toLocaleString()}</option>)}
         </select>
         <input type="number" min={1} placeholder="# ushers" value={form.number_of_ushers} onChange={(e) => setForm({ ...form, number_of_ushers: Number(e.target.value) })} className="rounded-md border px-3 py-2 text-sm" />
-        <input type="number" min={0} placeholder="Transport KES" value={form.transport_kes} onChange={(e) => setForm({ ...form, transport_kes: Number(e.target.value) })} className="rounded-md border px-3 py-2 text-sm" />
-        <textarea placeholder="Notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="rounded-md border px-3 py-2 text-sm sm:col-span-2" />
+        <label className="text-xs text-muted-foreground">Transport KES / usher / day
+          <input type="number" min={0} value={form.transport_rate_kes} onChange={(e) => setForm({ ...form, transport_rate_kes: Number(e.target.value) })} className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
+        </label>
+        <label className="text-xs text-muted-foreground">Quote valid for (days)
+          <input type="number" min={1} value={form.validity_days} onChange={(e) => setForm({ ...form, validity_days: Number(e.target.value) })} className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
+        </label>
+        <textarea placeholder="Notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="rounded-md border px-3 py-2 text-sm sm:col-span-3" />
+        <div className="sm:col-span-3 rounded-lg bg-cream p-3 text-sm">
+          <div className="flex justify-between"><span>Ushering: KES {(pkg?.price_kes ?? 0).toLocaleString()} × {form.number_of_ushers} ushers × {days} day{days > 1 ? "s" : ""}</span><span className="font-semibold">KES {subtotal.toLocaleString()}</span></div>
+          <div className="flex justify-between"><span>Transport: KES {form.transport_rate_kes.toLocaleString()} × {form.number_of_ushers} ushers × {days} day{days > 1 ? "s" : ""}</span><span className="font-semibold">KES {transportTotal.toLocaleString()}</span></div>
+          <div className="mt-2 flex justify-between border-t pt-2 font-display text-lg font-bold text-navy"><span>Total</span><span>KES {total.toLocaleString()}</span></div>
+          <div className="mt-1 text-xs text-muted-foreground">Valid until {new Date(Date.now() + form.validity_days * 86400000).toLocaleDateString()}</div>
+        </div>
         <button className="rounded-md bg-navy py-2 text-sm font-semibold text-primary-foreground">Generate quote PDF</button>
       </form>
 
@@ -68,7 +98,7 @@ function Page() {
               <tr key={q.id} className="border-t">
                 <td className="px-4 py-3 font-mono text-xs">{q.reference}</td>
                 <td className="px-4 py-3">{q.customer_name}<div className="text-xs text-muted-foreground">{q.customer_email}</div></td>
-                <td className="px-4 py-3">{q.event_type} <div className="text-xs text-muted-foreground">{q.event_date ?? "TBD"}</div></td>
+                <td className="px-4 py-3">{q.event_type} <div className="text-xs text-muted-foreground">{(q.event_dates?.length ? q.event_dates.join(", ") : q.event_date) ?? "TBD"} • {q.number_of_days ?? 1}d</div></td>
                 <td className="px-4 py-3">{q.number_of_ushers}</td>
                 <td className="px-4 py-3 font-semibold">KES {q.total_kes.toLocaleString()}</td>
                 <td className="px-4 py-3 text-xs">{new Date(q.created_at).toLocaleDateString()}</td>

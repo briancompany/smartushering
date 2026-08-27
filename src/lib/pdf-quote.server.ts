@@ -8,17 +8,24 @@ export type QuoteInput = {
   customer_phone?: string | null;
   event_type: string;
   event_date?: string | null;
+  event_dates?: string[];
+  number_of_days: number;
   venue?: string | null;
   county?: string | null;
   package_name: string;
   number_of_ushers: number;
   package_price_kes: number;
+  /** Transport per usher, per day */
+  transport_rate_kes: number;
+  /** Total transport = rate x ushers x days */
   transport_kes: number;
+  valid_until?: string | null;
   notes?: string | null;
 };
 
 export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; signedUrl: string }> {
-  const subtotal = q.package_price_kes * q.number_of_ushers;
+  const days = Math.max(1, q.number_of_days);
+  const subtotal = q.package_price_kes * q.number_of_ushers * days;
   const total = subtotal + q.transport_kes;
 
   const pdf = await PDFDocument.create();
@@ -49,9 +56,14 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
   y -= 8;
 
   // Event details
+  const dateList = (q.event_dates ?? []).filter(Boolean);
+  const datesLabel = dateList.length
+    ? dateList.join(", ").slice(0, 90)
+    : (q.event_date ?? "TBD");
   const lines: Array<[string, string]> = [
     ["Event Type", q.event_type],
-    ["Event Date", q.event_date ?? "TBD"],
+    [dateList.length > 1 ? "Event Dates" : "Event Date", datesLabel],
+    ["Duration", `${days} day${days > 1 ? "s" : ""}`],
     ["Venue", q.venue ?? "TBD"],
     ["County", q.county ?? "TBD"],
     ["Package", q.package_name],
@@ -72,9 +84,10 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
   page.drawText("Amount (KES)", { x: 460, y: y + 4, size: 10, font: bold, color: rgb(1, 1, 1) });
   y -= 24;
 
+  const qtyLabel = `${q.number_of_ushers} x ${days}d`;
   const rows = [
-    { d: `${q.package_name} package – ushering services`, qty: q.number_of_ushers, rate: q.package_price_kes, amt: subtotal },
-    { d: "Transport (host pays)", qty: q.number_of_ushers, rate: q.transport_kes ? Math.round(q.transport_kes / q.number_of_ushers) : 0, amt: q.transport_kes },
+    { d: `${q.package_name} package – ushering services (per usher/day)`, qty: qtyLabel, rate: q.package_price_kes, amt: subtotal },
+    { d: "Transport (per usher/day)", qty: qtyLabel, rate: q.transport_rate_kes, amt: q.transport_kes },
   ];
   for (const r of rows) {
     page.drawText(r.d, { x: 50, y, size: 10, font, color: navy });
@@ -98,7 +111,12 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
   }
 
   page.drawText("Host provides lunch for all ushers. Transport billed separately.", { x: 40, y: 80, size: 9, font, color: gray });
-  page.drawText("Quote valid for 14 days. Confirm by replying to this email or call 0112 836 281.", { x: 40, y: 66, size: 9, font, color: gray });
+  page.drawText(
+    q.valid_until
+      ? `Quote valid until ${q.valid_until}. Confirm by replying to this email or call 0112 836 281.`
+      : "Confirm by replying to this email or call 0112 836 281.",
+    { x: 40, y: 66, size: 9, font, color: gray },
+  );
   page.drawText("Smart Ushering • Nairobi, Kenya", { x: 40, y: 40, size: 8, font, color: gray });
 
   const bytes = await pdf.save();

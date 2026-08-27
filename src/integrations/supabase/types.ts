@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -680,9 +680,11 @@ export type Database = {
           customer_name: string
           customer_phone: string | null
           event_date: string | null
+          event_dates: string[]
           event_type: string
           id: string
           notes: string | null
+          number_of_days: number
           number_of_ushers: number
           package_name: string | null
           package_price_kes: number
@@ -693,6 +695,8 @@ export type Database = {
           subtotal_kes: number
           total_kes: number
           transport_kes: number
+          transport_rate_kes: number
+          valid_until: string | null
           venue: string | null
         }
         Insert: {
@@ -703,9 +707,11 @@ export type Database = {
           customer_name: string
           customer_phone?: string | null
           event_date?: string | null
+          event_dates?: string[]
           event_type: string
           id?: string
           notes?: string | null
+          number_of_days?: number
           number_of_ushers: number
           package_name?: string | null
           package_price_kes: number
@@ -716,6 +722,8 @@ export type Database = {
           subtotal_kes: number
           total_kes: number
           transport_kes?: number
+          transport_rate_kes?: number
+          valid_until?: string | null
           venue?: string | null
         }
         Update: {
@@ -726,9 +734,11 @@ export type Database = {
           customer_name?: string
           customer_phone?: string | null
           event_date?: string | null
+          event_dates?: string[]
           event_type?: string
           id?: string
           notes?: string | null
+          number_of_days?: number
           number_of_ushers?: number
           package_name?: string | null
           package_price_kes?: number
@@ -739,6 +749,8 @@ export type Database = {
           subtotal_kes?: number
           total_kes?: number
           transport_kes?: number
+          transport_rate_kes?: number
+          valid_until?: string | null
           venue?: string | null
         }
         Relationships: [

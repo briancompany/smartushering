@@ -159,19 +159,31 @@ export const adminCreateQuote = createServerFn({ method: "POST" })
     customer_phone: z.string().max(30).optional(),
     event_type: z.string().min(1).max(120),
     event_date: z.string().optional(),
+    event_dates: z.array(z.string()).max(60).optional(),
+    number_of_days: z.number().int().min(1).max(60).optional(),
+    validity_days: z.number().int().min(1).max(365).default(14),
     venue: z.string().max(200).optional(),
     county: z.string().max(120).optional(),
     package_slug: z.string().max(60),
     number_of_ushers: z.number().int().min(1).max(500),
-    transport_kes: z.number().int().min(0).max(10000000).default(0),
+    /** Transport per usher, per day */
+    transport_rate_kes: z.number().int().min(0).max(1000000).default(0),
     notes: z.string().max(1000).optional(),
   }).parse(d))
   .handler(async ({ data }) => {
     const admin = await requireAdmin(data.token);
     const { data: pkg } = await supabaseAdmin.from("pricing_packages").select("*").eq("slug", data.package_slug).maybeSingle();
     if (!pkg) throw new Error("Package not found");
-    const subtotal = pkg.price_kes * data.number_of_ushers;
-    const total = subtotal + data.transport_kes;
+
+    const dates = Array.from(new Set((data.event_dates ?? []).filter(Boolean))).sort();
+    const days = Math.max(1, dates.length || data.number_of_days || 1);
+    const firstDate = dates[0] ?? (data.event_date || null);
+
+    const subtotal = pkg.price_kes * data.number_of_ushers * days;
+    const transportTotal = data.transport_rate_kes * data.number_of_ushers * days;
+    const total = subtotal + transportTotal;
+    const validUntil = new Date(Date.now() + data.validity_days * 86400000).toISOString().slice(0, 10);
+
     const reference = "QT-" + Math.random().toString(36).slice(2, 8).toUpperCase();
     const { pdf, signedUrl } = await (async () => {
       const r = await generateQuotePdf({
@@ -180,13 +192,17 @@ export const adminCreateQuote = createServerFn({ method: "POST" })
         customer_email: data.customer_email,
         customer_phone: data.customer_phone,
         event_type: data.event_type,
-        event_date: data.event_date,
+        event_date: firstDate,
+        event_dates: dates,
+        number_of_days: days,
         venue: data.venue,
         county: data.county,
         package_name: pkg.name,
         number_of_ushers: data.number_of_ushers,
         package_price_kes: pkg.price_kes,
-        transport_kes: data.transport_kes,
+        transport_rate_kes: data.transport_rate_kes,
+        transport_kes: transportTotal,
+        valid_until: validUntil,
         notes: data.notes,
       });
       return { pdf: r.path, signedUrl: r.signedUrl };
@@ -195,9 +211,11 @@ export const adminCreateQuote = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin.from("quotes").insert({
       reference, customer_name: data.customer_name, customer_email: data.customer_email,
       customer_phone: data.customer_phone ?? null, event_type: data.event_type,
-      event_date: data.event_date || null, venue: data.venue ?? null, county: data.county ?? null,
+      event_date: firstDate, event_dates: dates, number_of_days: days, valid_until: validUntil,
+      venue: data.venue ?? null, county: data.county ?? null,
       package_slug: data.package_slug, package_name: pkg.name, number_of_ushers: data.number_of_ushers,
-      package_price_kes: pkg.price_kes, transport_kes: data.transport_kes,
+      package_price_kes: pkg.price_kes, transport_rate_kes: data.transport_rate_kes,
+      transport_kes: transportTotal,
       subtotal_kes: subtotal, total_kes: total, notes: data.notes ?? null, pdf_path: pdf,
     });
     if (error) throw new Error(error.message);
