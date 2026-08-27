@@ -8,17 +8,24 @@ export type QuoteInput = {
   customer_phone?: string | null;
   event_type: string;
   event_date?: string | null;
+  event_dates?: string[];
+  number_of_days: number;
   venue?: string | null;
   county?: string | null;
   package_name: string;
   number_of_ushers: number;
   package_price_kes: number;
+  /** Transport per usher, per day */
+  transport_rate_kes: number;
+  /** Total transport = rate x ushers x days */
   transport_kes: number;
+  valid_until?: string | null;
   notes?: string | null;
 };
 
 export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; signedUrl: string }> {
-  const subtotal = q.package_price_kes * q.number_of_ushers;
+  const days = Math.max(1, q.number_of_days);
+  const subtotal = q.package_price_kes * q.number_of_ushers * days;
   const total = subtotal + q.transport_kes;
 
   const pdf = await PDFDocument.create();
