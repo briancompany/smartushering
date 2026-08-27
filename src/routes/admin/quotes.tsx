@@ -7,7 +7,7 @@ import { Download, MessageCircle, X } from "lucide-react";
 import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminListQuotes, adminCreateQuote, adminGetQuoteUrl } from "@/lib/admin-phase2.functions";
 import { supabase } from "@/integrations/supabase/client";
- 
+
 const DEFAULT_WA = "254112836281";
 
 export const Route = createFileRoute("/admin/quotes")({
@@ -22,8 +22,9 @@ function ActionsModal({ q, onClose }: { q: QuoteAction; onClose: () => void }) {
     ? q.customerPhone.replace(/\D/g, "").replace(/^0/, "254")
     : DEFAULT_WA;
 
+  const quotePageUrl = `https://smartushering.vercel.app/quote/${q.reference}`;
   const waMessage = encodeURIComponent(
-    `Dear ${q.customerName ?? "Customer"},\n\nPlease find your Smart Ushering quotation (${q.reference}) via the link below:\n\n${q.signedUrl}\n\nFor any queries, call us on 0112 836 281.\n\nSmart Ushering — Every Guest Matters.`
+    `Dear ${q.customerName ?? "Customer"},\n\nPlease find your Smart Ushering quotation (${q.reference}) at the link below:\n\n${quotePageUrl}\n\nFor any queries, call us on 0112 836 281.\n\nSmart Ushering — Every Guest Matters.`
   );
   const waUrl = `https://wa.me/${phone}?text=${waMessage}`;
 
