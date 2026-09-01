@@ -9,7 +9,10 @@ export type QuoteInput = {
   event_type: string;
   event_date?: string | null;
   event_dates?: string[];
+  /** Per-date usher counts */
+  date_ushers?: Array<{ date: string; ushers: number }>;
   number_of_days: number;
+
   venue?: string | null;
   county?: string | null;
   package_name: string;
@@ -24,9 +27,16 @@ export type QuoteInput = {
 };
 
 export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; signedUrl: string }> {
-  const days = Math.max(1, q.number_of_days);
-  const subtotal = q.package_price_kes * q.number_of_ushers * days;
+  const breakdown = (q.date_ushers && q.date_ushers.length
+    ? q.date_ushers
+    : (q.event_dates ?? []).map((d) => ({ date: d, ushers: q.number_of_ushers }))
+  ).filter((b) => b.date);
+  const entries = breakdown.length ? breakdown : [{ date: q.event_date ?? "TBD", ushers: q.number_of_ushers }];
+  const days = Math.max(1, entries.length);
+  const usherDays = entries.reduce((s, b) => s + b.ushers, 0);
+  const subtotal = q.package_price_kes * usherDays;
   const total = subtotal + q.transport_kes;
+
 
   const pdf = await PDFDocument.create();
   const page = pdf.addPage([595, 842]); // A4
@@ -56,10 +66,15 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
   y -= 8;
 
   // Event details
-  const dateList = (q.event_dates ?? []).filter(Boolean);
+  const dateList = entries.map((e) => e.date);
   const datesLabel = dateList.length
     ? dateList.join(", ").slice(0, 90)
     : (q.event_date ?? "TBD");
+  const usherRange = (() => {
+    const min = Math.min(...entries.map((e) => e.ushers));
+    const max = Math.max(...entries.map((e) => e.ushers));
+    return min === max ? `${max} per day` : `${min}–${max} per day (${usherDays} usher-days)`;
+  })();
   const lines: Array<[string, string]> = [
     ["Event Type", q.event_type],
     [dateList.length > 1 ? "Event Dates" : "Event Date", datesLabel],
@@ -67,7 +82,7 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
     ["Venue", q.venue ?? "TBD"],
     ["County", q.county ?? "TBD"],
     ["Package", q.package_name],
-    ["Number of Ushers", String(q.number_of_ushers)],
+    ["Number of Ushers", usherRange],
   ];
   for (const [k, v] of lines) {
     page.drawText(k, { x: 40, y, size: 10, font: bold, color: navy });
@@ -76,54 +91,52 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
   }
   y -= 10;
 
-  // Cost table
+  // Cost table — one row per event date
   const COL_DESC = 48;
-  const COL_QTY_R = 372;   // right edge of Qty column
+  const COL_QTY_R = 372;   // right edge of Ushers column
   const COL_RATE_R = 455;  // right edge of Rate column
   const COL_AMT_R = 547;   // right edge of Amount column
   const right = (text: string, xRight: number, size: number, f = font, color = navy, yy = y) =>
     page.drawText(text, { x: xRight - f.widthOfTextAtSize(text, size), y: yy, size, font: f, color });
 
   page.drawRectangle({ x: 40, y: y - 6, width: 515, height: 26, color: navy });
-  page.drawText("Description", { x: COL_DESC + 2, y: y + 3, size: 9, font: bold, color: rgb(1, 1, 1) });
-  right("Ushers x Days", COL_QTY_R, 9, bold, rgb(1, 1, 1), y + 3);
+  page.drawText("Event day", { x: COL_DESC + 2, y: y + 3, size: 9, font: bold, color: rgb(1, 1, 1) });
+  right("Ushers", COL_QTY_R, 9, bold, rgb(1, 1, 1), y + 3);
   right("Rate / usher / day", COL_RATE_R, 9, bold, rgb(1, 1, 1), y + 3);
   right("Amount (KES)", COL_AMT_R, 9, bold, rgb(1, 1, 1), y + 3);
   y -= 30;
 
-  const qtyLabel = `${q.number_of_ushers} x ${days}`;
-  const rows = [
-    {
-      d: `${q.package_name} package - professional ushering services`,
-      sub: `${q.number_of_ushers} usher${q.number_of_ushers > 1 ? "s" : ""} x ${days} day${days > 1 ? "s" : ""} x KES ${q.package_price_kes.toLocaleString()} per usher per day`,
-      rate: q.package_price_kes,
-      amt: subtotal,
-    },
-    {
-      d: "Transport allowance",
-      sub: `${q.number_of_ushers} usher${q.number_of_ushers > 1 ? "s" : ""} x ${days} day${days > 1 ? "s" : ""} x KES ${q.transport_rate_kes.toLocaleString()} per usher per day`,
-      rate: q.transport_rate_kes,
-      amt: q.transport_kes,
-    },
-  ];
-  for (const r of rows) {
-    page.drawText(r.d, { x: COL_DESC + 2, y, size: 10, font: bold, color: navy, maxWidth: 250 });
-    right(qtyLabel, COL_QTY_R, 10, font, navy, y);
-    right(r.rate.toLocaleString(), COL_RATE_R, 10, font, navy, y);
-    right(r.amt.toLocaleString(), COL_AMT_R, 10, bold, navy, y);
+  const perUsherDay = q.package_price_kes + q.transport_rate_kes;
+  for (const [i, e] of entries.entries()) {
+    if (y < 190) {
+      page.drawText(`+ ${entries.length - i} more day(s) — see summary below`, { x: COL_DESC + 2, y, size: 9, font, color: gray });
+      y -= 18;
+      break;
+    }
+    const amt = e.ushers * perUsherDay;
+    page.drawText(`Day ${i + 1} — ${e.date}`, { x: COL_DESC + 2, y, size: 10, font: bold, color: navy, maxWidth: 250 });
+    right(String(e.ushers), COL_QTY_R, 10, font, navy, y);
+    right(perUsherDay.toLocaleString(), COL_RATE_R, 10, font, navy, y);
+    right(amt.toLocaleString(), COL_AMT_R, 10, bold, navy, y);
     y -= 13;
-    page.drawText(r.sub, { x: COL_DESC + 2, y, size: 8, font, color: gray, maxWidth: 300 });
+    page.drawText(
+      `${e.ushers} usher${e.ushers > 1 ? "s" : ""} x KES ${q.package_price_kes.toLocaleString()} ushering + KES ${q.transport_rate_kes.toLocaleString()} transport (per usher, per day)`,
+      { x: COL_DESC + 2, y, size: 8, font, color: gray, maxWidth: 300 },
+    );
     y -= 12;
     page.drawLine({ start: { x: 40, y }, end: { x: 555, y }, color: rgb(0.88, 0.88, 0.9), thickness: 0.5 });
     y -= 14;
   }
 
+
   y -= 2;
-  page.drawText("Subtotal (ushering)", { x: 300, y, size: 10, font, color: gray });
+  page.drawText(`Total usher-days: ${usherDays}`, { x: 40, y, size: 9, font, color: gray });
+  page.drawText(`Ushering (${usherDays} x KES ${q.package_price_kes.toLocaleString()})`, { x: 300, y, size: 10, font, color: gray });
   right(`KES ${subtotal.toLocaleString()}`, COL_AMT_R, 10, font, navy, y);
   y -= 15;
-  page.drawText("Transport total", { x: 300, y, size: 10, font, color: gray });
+  page.drawText(`Transport (${usherDays} x KES ${q.transport_rate_kes.toLocaleString()})`, { x: 300, y, size: 10, font, color: gray });
   right(`KES ${q.transport_kes.toLocaleString()}`, COL_AMT_R, 10, font, navy, y);
+
   y -= 12;
   page.drawLine({ start: { x: 300, y }, end: { x: 555, y }, color: gray, thickness: 0.5 });
   y -= 22;

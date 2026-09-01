@@ -66,12 +66,15 @@ function Page() {
     </div>
   );
 
+  const perDay = (Array.isArray(quote.date_ushers) ? quote.date_ushers : []) as Array<{ date: string; ushers: number }>;
   const days = quote.number_of_days ?? 1;
   const dates = quote.event_dates?.length ? quote.event_dates.join(", ") : (quote.event_date ?? "TBD");
-  const subtotal = quote.subtotal_kes ?? (quote.package_price_kes * quote.number_of_ushers * days);
+  const usherDays = perDay.length ? perDay.reduce((s, e) => s + e.ushers, 0) : quote.number_of_ushers * days;
+  const subtotal = quote.subtotal_kes ?? (quote.package_price_kes * usherDays);
   const transport = quote.transport_kes ?? 0;
   const total = quote.total_kes ?? (subtotal + transport);
   const isExpired = quote.valid_until ? new Date(quote.valid_until) < new Date() : false;
+
 
   return (
     <div className="min-h-screen bg-cream px-4 py-10">
@@ -121,7 +124,11 @@ function Page() {
                 ["Venue", quote.venue ?? "TBD"],
                 ["County", quote.county ?? "TBD"],
                 ["Package", quote.package_name],
-                ["No. of Ushers", String(quote.number_of_ushers)],
+                ["No. of Ushers", perDay.length
+                  ? (Math.min(...perDay.map((e) => e.ushers)) === Math.max(...perDay.map((e) => e.ushers))
+                      ? `${quote.number_of_ushers} per day`
+                      : `${Math.min(...perDay.map((e) => e.ushers))}–${Math.max(...perDay.map((e) => e.ushers))} per day (${usherDays} usher-days)`)
+                  : String(quote.number_of_ushers)],
               ].map(([k, v]) => (
                 <div key={k}>
                   <div className="text-xs text-muted-foreground">{k}</div>
@@ -134,11 +141,24 @@ function Page() {
             <div>
               <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Cost Breakdown</div>
               <div className="divide-y rounded-xl border">
+                {perDay.map((e, i) => (
+                  <div key={e.date} className="flex justify-between px-4 py-3 text-sm">
+                    <div>
+                      <div className="font-semibold text-navy">Day {i + 1} — {e.date}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {e.ushers} usher{e.ushers > 1 ? "s" : ""} × KES {(quote.package_price_kes + (quote.transport_rate_kes ?? 0)).toLocaleString()} (ushering + transport, per usher/day)
+                      </div>
+                    </div>
+                    <div className="font-semibold text-navy">
+                      KES {(e.ushers * (quote.package_price_kes + (quote.transport_rate_kes ?? 0))).toLocaleString()}
+                    </div>
+                  </div>
+                ))}
                 <div className="flex justify-between px-4 py-3 text-sm">
                   <div>
                     <div className="font-semibold text-navy">{quote.package_name} package</div>
                     <div className="text-xs text-muted-foreground">
-                      KES {quote.package_price_kes.toLocaleString()} × {quote.number_of_ushers} ushers × {days} day{days > 1 ? "s" : ""}
+                      KES {quote.package_price_kes.toLocaleString()} × {usherDays} usher-day{usherDays > 1 ? "s" : ""}
                     </div>
                   </div>
                   <div className="font-semibold text-navy">KES {subtotal.toLocaleString()}</div>
@@ -147,9 +167,10 @@ function Page() {
                   <div>
                     <div className="font-semibold text-navy">Transport allowance</div>
                     <div className="text-xs text-muted-foreground">
-                      KES {(quote.transport_rate_kes ?? 0).toLocaleString()} × {quote.number_of_ushers} ushers × {days} day{days > 1 ? "s" : ""}
+                      KES {(quote.transport_rate_kes ?? 0).toLocaleString()} × {usherDays} usher-day{usherDays > 1 ? "s" : ""}
                     </div>
                   </div>
+
                   <div className="font-semibold text-navy">KES {transport.toLocaleString()}</div>
                 </div>
                 <div className="flex justify-between rounded-b-xl bg-navy px-4 py-3">

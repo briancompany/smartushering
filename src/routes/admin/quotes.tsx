@@ -88,23 +88,28 @@ function Page() {
   const { data = [] } = useQuery({ queryKey: ["quotes", token], queryFn: () => list({ data: { token: token! } }), enabled: !!token });
   const { data: pkgs = [] } = useQuery({ queryKey: ["pkgs-q"], queryFn: async () => (await supabase.from("pricing_packages").select("*").order("display_order")).data ?? [] });
   const [form, setForm] = useState({ customer_name: "", customer_email: "", customer_phone: "", event_type: "Wedding", venue: "", county: "Nairobi", package_slug: "", number_of_ushers: 4, transport_rate_kes: 300, validity_days: 14, notes: "" });
-  const [dates, setDates] = useState<string[]>([""]);
+  const [dates, setDates] = useState<Array<{ date: string; ushers: number }>>([{ date: "", ushers: 4 }]);
   const [modal, setModal] = useState<QuoteAction | null>(null);
 
   if (!token) return null;
   if (!form.package_slug && pkgs[0]) setForm((f) => ({ ...f, package_slug: pkgs[0].slug }));
 
-  const cleanDates = Array.from(new Set(dates.filter(Boolean))).sort();
-  const days = Math.max(1, cleanDates.length);
+  const byDate = new Map<string, number>();
+  for (const d of dates) if (d.date) byDate.set(d.date, d.ushers);
+  const cleanEntries = [...byDate.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, ushers]) => ({ date, ushers }));
+  const days = Math.max(1, cleanEntries.length);
+  const usherDays = cleanEntries.reduce((s, e) => s + e.ushers, 0) || form.number_of_ushers;
   const pkg = pkgs.find((p) => p.slug === form.package_slug);
-  const subtotal = (pkg?.price_kes ?? 0) * form.number_of_ushers * days;
-  const transportTotal = form.transport_rate_kes * form.number_of_ushers * days;
+  const perUsherDay = (pkg?.price_kes ?? 0) + form.transport_rate_kes;
+  const subtotal = (pkg?.price_kes ?? 0) * usherDays;
+  const transportTotal = form.transport_rate_kes * usherDays;
   const total = subtotal + transportTotal;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const r = await create({ data: { token, ...form, event_dates: cleanDates, number_of_days: days, event_date: cleanDates[0] ?? "" } });
+      const r = await create({ data: { token, ...form, number_of_ushers: Math.max(1, ...cleanEntries.map((x) => x.ushers), form.number_of_ushers), date_ushers: cleanEntries, event_dates: cleanEntries.map((x) => x.date), number_of_days: days, event_date: cleanEntries[0]?.date ?? "" } });
+
       toast.success(`Quote ${r.reference} created`);
       qc.invalidateQueries({ queryKey: ["quotes"] });
       if (r.signedUrl) {
@@ -132,23 +137,34 @@ function Page() {
         <input placeholder="Phone" value={form.customer_phone} onChange={(e) => setForm({ ...form, customer_phone: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <input required placeholder="Event type" value={form.event_type} onChange={(e) => setForm({ ...form, event_type: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <div className="sm:col-span-3 rounded-md border bg-cream/50 p-3">
-          <div className="mb-2 text-xs font-semibold text-navy">Event dates — add one row per day the event runs ({days} day{days > 1 ? "s" : ""})</div>
-          <div className="flex flex-wrap gap-2">
+          <div className="mb-2 text-xs font-semibold text-navy">Event days — pick each date and how many ushers work that day ({days} day{days > 1 ? "s" : ""}, {usherDays} usher-days)</div>
+          <div className="flex flex-col gap-2">
             {dates.map((d, i) => (
-              <div key={i} className="flex items-center gap-1">
-                <input type="date" value={d} onChange={(e) => setDates(dates.map((x, j) => (j === i ? e.target.value : x)))} className="rounded-md border px-3 py-2 text-sm" />
+              <div key={i} className="flex flex-wrap items-center gap-2">
+                <span className="w-14 text-xs text-muted-foreground">Day {i + 1}</span>
+                <input type="date" value={d.date} onChange={(e) => setDates(dates.map((x, j) => (j === i ? { ...x, date: e.target.value } : x)))} className="rounded-md border px-3 py-2 text-sm" />
+                <label className="flex items-center gap-1 text-xs text-muted-foreground">
+                  Ushers
+                  <input type="number" min={1} value={d.ushers} onChange={(e) => setDates(dates.map((x, j) => (j === i ? { ...x, ushers: Math.max(1, Number(e.target.value)) } : x)))} className="w-24 rounded-md border px-3 py-2 text-sm" />
+                </label>
+                <span className="text-xs text-muted-foreground">KES {(d.ushers * perUsherDay).toLocaleString()}</span>
                 {dates.length > 1 && <button type="button" onClick={() => setDates(dates.filter((_, j) => j !== i))} className="rounded border px-2 py-1 text-xs">✕</button>}
               </div>
             ))}
-            <button type="button" onClick={() => setDates([...dates, ""])} className="rounded-md border border-navy px-3 py-2 text-xs font-semibold text-navy">+ Add day</button>
+            <div>
+              <button type="button" onClick={() => setDates([...dates, { date: "", ushers: dates[dates.length - 1]?.ushers ?? 4 }])} className="rounded-md border border-navy px-3 py-2 text-xs font-semibold text-navy">+ Add day</button>
+            </div>
           </div>
         </div>
+
         <input placeholder="Venue" value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <input placeholder="County" value={form.county} onChange={(e) => setForm({ ...form, county: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <select value={form.package_slug} onChange={(e) => setForm({ ...form, package_slug: e.target.value })} className="rounded-md border px-3 py-2 text-sm">
           {pkgs.map((p) => <option key={p.slug} value={p.slug}>{p.name} — KES {p.price_kes.toLocaleString()}</option>)}
         </select>
-        <input type="number" min={1} placeholder="# ushers" value={form.number_of_ushers} onChange={(e) => setForm({ ...form, number_of_ushers: Number(e.target.value) })} className="rounded-md border px-3 py-2 text-sm" />
+        <label className="text-xs text-muted-foreground">Default ushers per day
+          <input type="number" min={1} value={form.number_of_ushers} onChange={(e) => setForm({ ...form, number_of_ushers: Number(e.target.value) })} className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
+        </label>
         <label className="text-xs text-muted-foreground">Transport KES / usher / day
           <input type="number" min={0} value={form.transport_rate_kes} onChange={(e) => setForm({ ...form, transport_rate_kes: Number(e.target.value) })} className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
         </label>
@@ -157,8 +173,15 @@ function Page() {
         </label>
         <textarea placeholder="Notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="rounded-md border px-3 py-2 text-sm sm:col-span-3" />
         <div className="sm:col-span-3 rounded-lg bg-cream p-3 text-sm">
-          <div className="flex justify-between"><span>Ushering: KES {(pkg?.price_kes ?? 0).toLocaleString()} × {form.number_of_ushers} ushers × {days} day{days > 1 ? "s" : ""}</span><span className="font-semibold">KES {subtotal.toLocaleString()}</span></div>
-          <div className="flex justify-between"><span>Transport: KES {form.transport_rate_kes.toLocaleString()} × {form.number_of_ushers} ushers × {days} day{days > 1 ? "s" : ""}</span><span className="font-semibold">KES {transportTotal.toLocaleString()}</span></div>
+          {cleanEntries.map((e) => (
+            <div key={e.date} className="flex justify-between text-xs text-muted-foreground">
+              <span>{e.date} — {e.ushers} usher{e.ushers > 1 ? "s" : ""} × KES {perUsherDay.toLocaleString()}</span>
+              <span>KES {(e.ushers * perUsherDay).toLocaleString()}</span>
+            </div>
+          ))}
+          <div className="mt-2 flex justify-between"><span>Ushering: KES {(pkg?.price_kes ?? 0).toLocaleString()} × {usherDays} usher-day{usherDays > 1 ? "s" : ""}</span><span className="font-semibold">KES {subtotal.toLocaleString()}</span></div>
+          <div className="flex justify-between"><span>Transport: KES {form.transport_rate_kes.toLocaleString()} × {usherDays} usher-day{usherDays > 1 ? "s" : ""}</span><span className="font-semibold">KES {transportTotal.toLocaleString()}</span></div>
+
           <div className="mt-2 flex justify-between border-t pt-2 font-display text-lg font-bold text-navy"><span>Total</span><span>KES {total.toLocaleString()}</span></div>
           <div className="mt-1 text-xs text-muted-foreground">Valid until {new Date(Date.now() + form.validity_days * 86400000).toLocaleDateString()}</div>
         </div>
