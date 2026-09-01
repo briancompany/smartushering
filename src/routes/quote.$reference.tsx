@@ -141,11 +141,24 @@ function Page() {
             <div>
               <div className="text-xs font-semibold uppercase text-muted-foreground mb-2">Cost Breakdown</div>
               <div className="divide-y rounded-xl border">
+                {perDay.map((e, i) => (
+                  <div key={e.date} className="flex justify-between px-4 py-3 text-sm">
+                    <div>
+                      <div className="font-semibold text-navy">Day {i + 1} — {e.date}</div>
+                      <div className="text-xs text-muted-foreground">
+                        {e.ushers} usher{e.ushers > 1 ? "s" : ""} × KES {(quote.package_price_kes + (quote.transport_rate_kes ?? 0)).toLocaleString()} (ushering + transport, per usher/day)
+                      </div>
+                    </div>
+                    <div className="font-semibold text-navy">
+                      KES {(e.ushers * (quote.package_price_kes + (quote.transport_rate_kes ?? 0))).toLocaleString()}
+                    </div>
+                  </div>
+                ))}
                 <div className="flex justify-between px-4 py-3 text-sm">
                   <div>
                     <div className="font-semibold text-navy">{quote.package_name} package</div>
                     <div className="text-xs text-muted-foreground">
-                      KES {quote.package_price_kes.toLocaleString()} × {quote.number_of_ushers} ushers × {days} day{days > 1 ? "s" : ""}
+                      KES {quote.package_price_kes.toLocaleString()} × {usherDays} usher-day{usherDays > 1 ? "s" : ""}
                     </div>
                   </div>
                   <div className="font-semibold text-navy">KES {subtotal.toLocaleString()}</div>
@@ -154,9 +167,10 @@ function Page() {
                   <div>
                     <div className="font-semibold text-navy">Transport allowance</div>
                     <div className="text-xs text-muted-foreground">
-                      KES {(quote.transport_rate_kes ?? 0).toLocaleString()} × {quote.number_of_ushers} ushers × {days} day{days > 1 ? "s" : ""}
+                      KES {(quote.transport_rate_kes ?? 0).toLocaleString()} × {usherDays} usher-day{usherDays > 1 ? "s" : ""}
                     </div>
                   </div>
+
                   <div className="font-semibold text-navy">KES {transport.toLocaleString()}</div>
                 </div>
                 <div className="flex justify-between rounded-b-xl bg-navy px-4 py-3">
