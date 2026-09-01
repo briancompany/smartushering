@@ -27,9 +27,16 @@ export type QuoteInput = {
 };
 
 export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; signedUrl: string }> {
-  const days = Math.max(1, q.number_of_days);
-  const subtotal = q.package_price_kes * q.number_of_ushers * days;
+  const breakdown = (q.date_ushers && q.date_ushers.length
+    ? q.date_ushers
+    : (q.event_dates ?? []).map((d) => ({ date: d, ushers: q.number_of_ushers }))
+  ).filter((b) => b.date);
+  const entries = breakdown.length ? breakdown : [{ date: q.event_date ?? "TBD", ushers: q.number_of_ushers }];
+  const days = Math.max(1, entries.length);
+  const usherDays = entries.reduce((s, b) => s + b.ushers, 0);
+  const subtotal = q.package_price_kes * usherDays;
   const total = subtotal + q.transport_kes;
+
 
   const pdf = await PDFDocument.create();
   const page = pdf.addPage([595, 842]); // A4
