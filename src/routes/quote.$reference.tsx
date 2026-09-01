@@ -124,7 +124,11 @@ function Page() {
                 ["Venue", quote.venue ?? "TBD"],
                 ["County", quote.county ?? "TBD"],
                 ["Package", quote.package_name],
-                ["No. of Ushers", String(quote.number_of_ushers)],
+                ["No. of Ushers", perDay.length
+                  ? (Math.min(...perDay.map((e) => e.ushers)) === Math.max(...perDay.map((e) => e.ushers))
+                      ? `${quote.number_of_ushers} per day`
+                      : `${Math.min(...perDay.map((e) => e.ushers))}–${Math.max(...perDay.map((e) => e.ushers))} per day (${usherDays} usher-days)`)
+                  : String(quote.number_of_ushers)],
               ].map(([k, v]) => (
                 <div key={k}>
                   <div className="text-xs text-muted-foreground">{k}</div>
