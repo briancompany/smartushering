@@ -25,6 +25,7 @@ import { Route as ConcernsRouteImport } from './routes/concerns'
 import { Route as BookRouteImport } from './routes/book'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as QuoteReferenceRouteImport } from './routes/quote.$reference'
 import { Route as AdminWarmupRouteImport } from './routes/admin/warmup'
 import { Route as AdminTicketsRouteImport } from './routes/admin/tickets'
 import { Route as AdminStaffRouteImport } from './routes/admin/staff'
@@ -128,6 +129,11 @@ const IndexRoute = IndexRouteImport.update({
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const QuoteReferenceRoute = QuoteReferenceRouteImport.update({
+  id: '/quote/$reference',
+  path: '/quote/$reference',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminWarmupRoute = AdminWarmupRouteImport.update({
@@ -290,6 +296,7 @@ export interface FileRoutesByFullPath {
   '/admin/staff': typeof AdminStaffRoute
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/warmup': typeof AdminWarmupRoute
+  '/quote/$reference': typeof QuoteReferenceRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
 }
@@ -332,6 +339,7 @@ export interface FileRoutesByTo {
   '/admin/staff': typeof AdminStaffRoute
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/warmup': typeof AdminWarmupRoute
+  '/quote/$reference': typeof QuoteReferenceRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
 }
@@ -375,6 +383,7 @@ export interface FileRoutesById {
   '/admin/staff': typeof AdminStaffRoute
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/warmup': typeof AdminWarmupRoute
+  '/quote/$reference': typeof QuoteReferenceRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
 }
@@ -419,6 +428,7 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/tickets'
     | '/admin/warmup'
+    | '/quote/$reference'
     | '/admin/'
     | '/api/public/hooks/warmup'
   fileRoutesByTo: FileRoutesByTo
@@ -461,6 +471,7 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/tickets'
     | '/admin/warmup'
+    | '/quote/$reference'
     | '/admin'
     | '/api/public/hooks/warmup'
   id:
@@ -503,6 +514,7 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/tickets'
     | '/admin/warmup'
+    | '/quote/$reference'
     | '/admin/'
     | '/api/public/hooks/warmup'
   fileRoutesById: FileRoutesById
@@ -546,6 +558,7 @@ export interface RootRouteChildren {
   AdminStaffRoute: typeof AdminStaffRoute
   AdminTicketsRoute: typeof AdminTicketsRoute
   AdminWarmupRoute: typeof AdminWarmupRoute
+  QuoteReferenceRoute: typeof QuoteReferenceRoute
   AdminIndexRoute: typeof AdminIndexRoute
   ApiPublicHooksWarmupRoute: typeof ApiPublicHooksWarmupRoute
 }
@@ -662,6 +675,13 @@ declare module '@tanstack/react-router' {
       path: '/admin'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quote/$reference': {
+      id: '/quote/$reference'
+      path: '/quote/$reference'
+      fullPath: '/quote/$reference'
+      preLoaderRoute: typeof QuoteReferenceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin/warmup': {
@@ -874,6 +894,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminStaffRoute: AdminStaffRoute,
   AdminTicketsRoute: AdminTicketsRoute,
   AdminWarmupRoute: AdminWarmupRoute,
+  QuoteReferenceRoute: QuoteReferenceRoute,
   AdminIndexRoute: AdminIndexRoute,
   ApiPublicHooksWarmupRoute: ApiPublicHooksWarmupRoute,
 }
