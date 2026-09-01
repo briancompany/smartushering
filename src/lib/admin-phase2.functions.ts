@@ -253,7 +253,7 @@ export const getQuoteByReference = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const { data: q, error } = await supabaseAdmin
       .from("quotes")
-      .select("reference, customer_name, event_type, event_date, event_dates, number_of_days, venue, county, package_name, number_of_ushers, package_price_kes, transport_rate_kes, transport_kes, subtotal_kes, total_kes, valid_until, notes, pdf_path, created_at")
+      .select("reference, customer_name, event_type, event_date, event_dates, date_ushers, number_of_days, venue, county, package_name, number_of_ushers, package_price_kes, transport_rate_kes, transport_kes, subtotal_kes, total_kes, valid_until, notes, pdf_path, created_at")
       .eq("reference", data.reference)
       .maybeSingle();
     if (error || !q) throw new Error("Quote not found");
