@@ -88,23 +88,28 @@ function Page() {
   const { data = [] } = useQuery({ queryKey: ["quotes", token], queryFn: () => list({ data: { token: token! } }), enabled: !!token });
   const { data: pkgs = [] } = useQuery({ queryKey: ["pkgs-q"], queryFn: async () => (await supabase.from("pricing_packages").select("*").order("display_order")).data ?? [] });
   const [form, setForm] = useState({ customer_name: "", customer_email: "", customer_phone: "", event_type: "Wedding", venue: "", county: "Nairobi", package_slug: "", number_of_ushers: 4, transport_rate_kes: 300, validity_days: 14, notes: "" });
-  const [dates, setDates] = useState<string[]>([""]);
+  const [dates, setDates] = useState<Array<{ date: string; ushers: number }>>([{ date: "", ushers: 4 }]);
   const [modal, setModal] = useState<QuoteAction | null>(null);
 
   if (!token) return null;
   if (!form.package_slug && pkgs[0]) setForm((f) => ({ ...f, package_slug: pkgs[0].slug }));
 
-  const cleanDates = Array.from(new Set(dates.filter(Boolean))).sort();
-  const days = Math.max(1, cleanDates.length);
+  const byDate = new Map<string, number>();
+  for (const d of dates) if (d.date) byDate.set(d.date, d.ushers);
+  const cleanEntries = [...byDate.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, ushers]) => ({ date, ushers }));
+  const days = Math.max(1, cleanEntries.length);
+  const usherDays = cleanEntries.reduce((s, e) => s + e.ushers, 0) || form.number_of_ushers;
   const pkg = pkgs.find((p) => p.slug === form.package_slug);
-  const subtotal = (pkg?.price_kes ?? 0) * form.number_of_ushers * days;
-  const transportTotal = form.transport_rate_kes * form.number_of_ushers * days;
+  const perUsherDay = (pkg?.price_kes ?? 0) + form.transport_rate_kes;
+  const subtotal = (pkg?.price_kes ?? 0) * usherDays;
+  const transportTotal = form.transport_rate_kes * usherDays;
   const total = subtotal + transportTotal;
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const r = await create({ data: { token, ...form, event_dates: cleanDates, number_of_days: days, event_date: cleanDates[0] ?? "" } });
+      const r = await create({ data: { token, ...form, number_of_ushers: Math.max(1, ...cleanEntries.map((x) => x.ushers), form.number_of_ushers), date_ushers: cleanEntries, event_dates: cleanEntries.map((x) => x.date), number_of_days: days, event_date: cleanEntries[0]?.date ?? "" } });
+
       toast.success(`Quote ${r.reference} created`);
       qc.invalidateQueries({ queryKey: ["quotes"] });
       if (r.signedUrl) {
