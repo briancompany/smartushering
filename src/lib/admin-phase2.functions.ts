@@ -159,6 +159,7 @@ export const adminCreateQuote = createServerFn({ method: "POST" })
     event_type: z.string().min(1).max(120),
     event_date: z.string().optional(),
     event_dates: z.array(z.string()).max(60).optional(),
+    date_ushers: z.array(z.object({ date: z.string().min(1), ushers: z.number().int().min(1).max(500) })).max(60).optional(),
     number_of_days: z.number().int().min(1).max(60).optional(),
     validity_days: z.number().int().min(1).max(365).default(14),
     venue: z.string().max(200).optional(),
@@ -173,12 +174,25 @@ export const adminCreateQuote = createServerFn({ method: "POST" })
     const { data: pkg } = await supabaseAdmin.from("pricing_packages").select("*").eq("slug", data.package_slug).maybeSingle();
     if (!pkg) throw new Error("Package not found");
 
-    const dates = Array.from(new Set((data.event_dates ?? []).filter(Boolean))).sort();
-    const days = Math.max(1, dates.length || data.number_of_days || 1);
-    const firstDate = dates[0] ?? (data.event_date || null);
+    // Per-date usher counts (deduped by date, sorted)
+    const map = new Map<string, number>();
+    for (const e of data.date_ushers ?? []) if (e.date) map.set(e.date, e.ushers);
+    if (map.size === 0) {
+      for (const d of data.event_dates ?? []) if (d) map.set(d, data.number_of_ushers);
+    }
+    let breakdown = [...map.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([date, ushers]) => ({ date, ushers }));
+    if (breakdown.length === 0) {
+      breakdown = [{ date: data.event_date || new Date().toISOString().slice(0, 10), ushers: data.number_of_ushers }];
+    }
 
-    const subtotal = pkg.price_kes * data.number_of_ushers * days;
-    const transportTotal = data.transport_rate_kes * data.number_of_ushers * days;
+    const dates = breakdown.map((b) => b.date);
+    const days = breakdown.length;
+    const firstDate = dates[0] ?? (data.event_date || null);
+    const usherDays = breakdown.reduce((s, b) => s + b.ushers, 0);
+    const maxUshers = Math.max(...breakdown.map((b) => b.ushers));
+
+    const subtotal = pkg.price_kes * usherDays;
+    const transportTotal = data.transport_rate_kes * usherDays;
     const total = subtotal + transportTotal;
     const validUntil = new Date(Date.now() + data.validity_days * 86400000).toISOString().slice(0, 10);
 
@@ -192,11 +206,12 @@ export const adminCreateQuote = createServerFn({ method: "POST" })
         event_type: data.event_type,
         event_date: firstDate,
         event_dates: dates,
+        date_ushers: breakdown,
         number_of_days: days,
         venue: data.venue,
         county: data.county,
         package_name: pkg.name,
-        number_of_ushers: data.number_of_ushers,
+        number_of_ushers: maxUshers,
         package_price_kes: pkg.price_kes,
         transport_rate_kes: data.transport_rate_kes,
         transport_kes: transportTotal,
@@ -209,9 +224,9 @@ export const adminCreateQuote = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin.from("quotes").insert({
       reference, customer_name: data.customer_name, customer_email: data.customer_email,
       customer_phone: data.customer_phone ?? null, event_type: data.event_type,
-      event_date: firstDate, event_dates: dates, number_of_days: days, valid_until: validUntil,
+      event_date: firstDate, event_dates: dates, date_ushers: breakdown, number_of_days: days, valid_until: validUntil,
       venue: data.venue ?? null, county: data.county ?? null,
-      package_slug: data.package_slug, package_name: pkg.name, number_of_ushers: data.number_of_ushers,
+      package_slug: data.package_slug, package_name: pkg.name, number_of_ushers: maxUshers,
       package_price_kes: pkg.price_kes, transport_rate_kes: data.transport_rate_kes,
       transport_kes: transportTotal,
       subtotal_kes: subtotal, total_kes: total, notes: data.notes ?? null, pdf_path: pdf,
@@ -220,6 +235,7 @@ export const adminCreateQuote = createServerFn({ method: "POST" })
     await logAudit({ actor: admin.username, action: "quote.create", entity: "quote", diff: { reference, total } });
     return { ok: true, reference, signedUrl };
   });
+
 
 export const adminGetQuoteUrl = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ token: z.string(), id: z.string().uuid() }).parse(d))
