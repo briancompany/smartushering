@@ -66,12 +66,15 @@ function Page() {
     </div>
   );
 
+  const perDay = (Array.isArray(quote.date_ushers) ? quote.date_ushers : []) as Array<{ date: string; ushers: number }>;
   const days = quote.number_of_days ?? 1;
   const dates = quote.event_dates?.length ? quote.event_dates.join(", ") : (quote.event_date ?? "TBD");
-  const subtotal = quote.subtotal_kes ?? (quote.package_price_kes * quote.number_of_ushers * days);
+  const usherDays = perDay.length ? perDay.reduce((s, e) => s + e.ushers, 0) : quote.number_of_ushers * days;
+  const subtotal = quote.subtotal_kes ?? (quote.package_price_kes * usherDays);
   const transport = quote.transport_kes ?? 0;
   const total = quote.total_kes ?? (subtotal + transport);
   const isExpired = quote.valid_until ? new Date(quote.valid_until) < new Date() : false;
+
 
   return (
     <div className="min-h-screen bg-cream px-4 py-10">
