@@ -130,11 +130,13 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
 
 
   y -= 2;
-  page.drawText("Subtotal (ushering)", { x: 300, y, size: 10, font, color: gray });
+  page.drawText(`Total usher-days: ${usherDays}`, { x: 40, y, size: 9, font, color: gray });
+  page.drawText(`Ushering (${usherDays} x KES ${q.package_price_kes.toLocaleString()})`, { x: 300, y, size: 10, font, color: gray });
   right(`KES ${subtotal.toLocaleString()}`, COL_AMT_R, 10, font, navy, y);
   y -= 15;
-  page.drawText("Transport total", { x: 300, y, size: 10, font, color: gray });
+  page.drawText(`Transport (${usherDays} x KES ${q.transport_rate_kes.toLocaleString()})`, { x: 300, y, size: 10, font, color: gray });
   right(`KES ${q.transport_kes.toLocaleString()}`, COL_AMT_R, 10, font, navy, y);
+
   y -= 12;
   page.drawLine({ start: { x: 300, y }, end: { x: 555, y }, color: gray, thickness: 0.5 });
   y -= 22;
