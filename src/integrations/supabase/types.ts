@@ -679,6 +679,7 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone: string | null
+          date_ushers: Json
           event_date: string | null
           event_dates: string[]
           event_type: string
@@ -706,6 +707,7 @@ export type Database = {
           customer_email: string
           customer_name: string
           customer_phone?: string | null
+          date_ushers?: Json
           event_date?: string | null
           event_dates?: string[]
           event_type: string
@@ -733,6 +735,7 @@ export type Database = {
           customer_email?: string
           customer_name?: string
           customer_phone?: string | null
+          date_ushers?: Json
           event_date?: string | null
           event_dates?: string[]
           event_type?: string

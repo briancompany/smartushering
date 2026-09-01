@@ -1,0 +1,1 @@
+ALTER TABLE public.quotes ADD COLUMN IF NOT EXISTS date_ushers jsonb NOT NULL DEFAULT '[]'::jsonb;
