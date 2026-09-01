@@ -162,7 +162,9 @@ function Page() {
         <select value={form.package_slug} onChange={(e) => setForm({ ...form, package_slug: e.target.value })} className="rounded-md border px-3 py-2 text-sm">
           {pkgs.map((p) => <option key={p.slug} value={p.slug}>{p.name} — KES {p.price_kes.toLocaleString()}</option>)}
         </select>
-        <input type="number" min={1} placeholder="# ushers" value={form.number_of_ushers} onChange={(e) => setForm({ ...form, number_of_ushers: Number(e.target.value) })} className="rounded-md border px-3 py-2 text-sm" />
+        <label className="text-xs text-muted-foreground">Default ushers per day
+          <input type="number" min={1} value={form.number_of_ushers} onChange={(e) => setForm({ ...form, number_of_ushers: Number(e.target.value) })} className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
+        </label>
         <label className="text-xs text-muted-foreground">Transport KES / usher / day
           <input type="number" min={0} value={form.transport_rate_kes} onChange={(e) => setForm({ ...form, transport_rate_kes: Number(e.target.value) })} className="mt-1 w-full rounded-md border px-3 py-2 text-sm" />
         </label>
@@ -171,8 +173,15 @@ function Page() {
         </label>
         <textarea placeholder="Notes" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className="rounded-md border px-3 py-2 text-sm sm:col-span-3" />
         <div className="sm:col-span-3 rounded-lg bg-cream p-3 text-sm">
-          <div className="flex justify-between"><span>Ushering: KES {(pkg?.price_kes ?? 0).toLocaleString()} × {form.number_of_ushers} ushers × {days} day{days > 1 ? "s" : ""}</span><span className="font-semibold">KES {subtotal.toLocaleString()}</span></div>
-          <div className="flex justify-between"><span>Transport: KES {form.transport_rate_kes.toLocaleString()} × {form.number_of_ushers} ushers × {days} day{days > 1 ? "s" : ""}</span><span className="font-semibold">KES {transportTotal.toLocaleString()}</span></div>
+          {cleanEntries.map((e) => (
+            <div key={e.date} className="flex justify-between text-xs text-muted-foreground">
+              <span>{e.date} — {e.ushers} usher{e.ushers > 1 ? "s" : ""} × KES {perUsherDay.toLocaleString()}</span>
+              <span>KES {(e.ushers * perUsherDay).toLocaleString()}</span>
+            </div>
+          ))}
+          <div className="mt-2 flex justify-between"><span>Ushering: KES {(pkg?.price_kes ?? 0).toLocaleString()} × {usherDays} usher-day{usherDays > 1 ? "s" : ""}</span><span className="font-semibold">KES {subtotal.toLocaleString()}</span></div>
+          <div className="flex justify-between"><span>Transport: KES {form.transport_rate_kes.toLocaleString()} × {usherDays} usher-day{usherDays > 1 ? "s" : ""}</span><span className="font-semibold">KES {transportTotal.toLocaleString()}</span></div>
+
           <div className="mt-2 flex justify-between border-t pt-2 font-display text-lg font-bold text-navy"><span>Total</span><span>KES {total.toLocaleString()}</span></div>
           <div className="mt-1 text-xs text-muted-foreground">Valid until {new Date(Date.now() + form.validity_days * 86400000).toLocaleDateString()}</div>
         </div>
