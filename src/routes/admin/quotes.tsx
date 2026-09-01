@@ -132,17 +132,26 @@ function Page() {
         <input placeholder="Phone" value={form.customer_phone} onChange={(e) => setForm({ ...form, customer_phone: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <input required placeholder="Event type" value={form.event_type} onChange={(e) => setForm({ ...form, event_type: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <div className="sm:col-span-3 rounded-md border bg-cream/50 p-3">
-          <div className="mb-2 text-xs font-semibold text-navy">Event dates — add one row per day the event runs ({days} day{days > 1 ? "s" : ""})</div>
-          <div className="flex flex-wrap gap-2">
+          <div className="mb-2 text-xs font-semibold text-navy">Event days — pick each date and how many ushers work that day ({days} day{days > 1 ? "s" : ""}, {usherDays} usher-days)</div>
+          <div className="flex flex-col gap-2">
             {dates.map((d, i) => (
-              <div key={i} className="flex items-center gap-1">
-                <input type="date" value={d} onChange={(e) => setDates(dates.map((x, j) => (j === i ? e.target.value : x)))} className="rounded-md border px-3 py-2 text-sm" />
+              <div key={i} className="flex flex-wrap items-center gap-2">
+                <span className="w-14 text-xs text-muted-foreground">Day {i + 1}</span>
+                <input type="date" value={d.date} onChange={(e) => setDates(dates.map((x, j) => (j === i ? { ...x, date: e.target.value } : x)))} className="rounded-md border px-3 py-2 text-sm" />
+                <label className="flex items-center gap-1 text-xs text-muted-foreground">
+                  Ushers
+                  <input type="number" min={1} value={d.ushers} onChange={(e) => setDates(dates.map((x, j) => (j === i ? { ...x, ushers: Math.max(1, Number(e.target.value)) } : x)))} className="w-24 rounded-md border px-3 py-2 text-sm" />
+                </label>
+                <span className="text-xs text-muted-foreground">KES {(d.ushers * perUsherDay).toLocaleString()}</span>
                 {dates.length > 1 && <button type="button" onClick={() => setDates(dates.filter((_, j) => j !== i))} className="rounded border px-2 py-1 text-xs">✕</button>}
               </div>
             ))}
-            <button type="button" onClick={() => setDates([...dates, ""])} className="rounded-md border border-navy px-3 py-2 text-xs font-semibold text-navy">+ Add day</button>
+            <div>
+              <button type="button" onClick={() => setDates([...dates, { date: "", ushers: dates[dates.length - 1]?.ushers ?? 4 }])} className="rounded-md border border-navy px-3 py-2 text-xs font-semibold text-navy">+ Add day</button>
+            </div>
           </div>
         </div>
+
         <input placeholder="Venue" value={form.venue} onChange={(e) => setForm({ ...form, venue: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <input placeholder="County" value={form.county} onChange={(e) => setForm({ ...form, county: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
         <select value={form.package_slug} onChange={(e) => setForm({ ...form, package_slug: e.target.value })} className="rounded-md border px-3 py-2 text-sm">
