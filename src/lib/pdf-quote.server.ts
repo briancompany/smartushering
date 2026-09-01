@@ -9,7 +9,10 @@ export type QuoteInput = {
   event_type: string;
   event_date?: string | null;
   event_dates?: string[];
+  /** Per-date usher counts */
+  date_ushers?: Array<{ date: string; ushers: number }>;
   number_of_days: number;
+
   venue?: string | null;
   county?: string | null;
   package_name: string;
