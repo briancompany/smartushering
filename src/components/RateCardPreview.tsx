@@ -1,0 +1,156 @@
+import { useState } from "react";
+import { Download, Minus, Plus, RotateCcw, X } from "lucide-react";
+import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+
+export type RateCardPackage = {
+  id: string;
+  name: string;
+  description: string;
+  price_kes: number;
+  features: unknown;
+};
+
+type Props = {
+  packages: RateCardPackage[];
+  transport: string;
+  onClose: () => void;
+};
+
+const getFeatures = (value: unknown) => Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+const safePdfText = (value: string) => value.replace(/[–—]/g, "-").replace(/•/g, "-").replace(/[^\x20-\x7E]/g, "");
+
+export async function createRateCardPdf(packages: RateCardPackage[], transport: string) {
+  const pdf = await PDFDocument.create();
+  const page = pdf.addPage([595, 842]);
+  const font = await pdf.embedFont(StandardFonts.Helvetica);
+  const bold = await pdf.embedFont(StandardFonts.HelveticaBold);
+  const navy = rgb(0.07, 0.13, 0.27);
+  const gold = rgb(0.78, 0.66, 0.36);
+  const gray = rgb(0.4, 0.4, 0.45);
+  const pale = rgb(0.97, 0.96, 0.92);
+
+  page.drawRectangle({ x: 0, y: 750, width: 595, height: 92, color: navy });
+  page.drawText("SMART USHERING", { x: 42, y: 801, size: 21, font: bold, color: gold });
+  page.drawText("PROFESSIONAL USHERING RATE CARD", { x: 42, y: 780, size: 11, font: bold, color: rgb(1, 1, 1) });
+  page.drawText("Every Guest Matters. Every Event Counts.", { x: 42, y: 764, size: 8.5, font, color: rgb(1, 1, 1) });
+
+  let y = 718;
+  page.drawText("CURRENT PACKAGES", { x: 42, y, size: 9, font: bold, color: gold });
+  page.drawText("Rates are quoted per usher, per event day.", { x: 385, y, size: 8, font, color: gray });
+  y -= 22;
+
+  for (const pkg of packages) {
+    const features = getFeatures(pkg.features).slice(0, 5);
+    const boxHeight = Math.max(112, 77 + features.length * 13);
+    if (y - boxHeight < 116) break;
+    page.drawRectangle({ x: 40, y: y - boxHeight + 14, width: 515, height: boxHeight, color: pale, borderColor: gold, borderWidth: 0.7 });
+    page.drawText(safePdfText(pkg.name.toUpperCase()), { x: 54, y: y - 8, size: 14, font: bold, color: navy, maxWidth: 285 });
+    const price = `KES ${pkg.price_kes.toLocaleString("en-KE")}`;
+    page.drawText(price, { x: 537 - bold.widthOfTextAtSize(price, 16), y: y - 8, size: 16, font: bold, color: navy });
+    page.drawText("PER USHER / EVENT DAY", { x: 414, y: y - 23, size: 7, font: bold, color: gold });
+    page.drawText(safePdfText(pkg.description).slice(0, 100), { x: 54, y: y - 31, size: 8.5, font, color: gray, maxWidth: 340 });
+    let featureY = y - 51;
+    for (const feature of features) {
+      page.drawCircle({ x: 58, y: featureY + 2, size: 2, color: gold });
+      page.drawText(safePdfText(feature).slice(0, 76), { x: 68, y: featureY, size: 8.2, font, color: navy, maxWidth: 455 });
+      featureY -= 13;
+    }
+    y -= boxHeight + 10;
+  }
+
+  page.drawRectangle({ x: 40, y: 65, width: 515, height: 36, color: navy });
+  page.drawText("TRANSPORT WITHIN NAIROBI", { x: 54, y: 84, size: 8.5, font: bold, color: rgb(1, 1, 1) });
+  page.drawText(`KES ${Number(transport || 0).toLocaleString("en-KE")} per usher / event day`, { x: 334, y: 82, size: 10, font: bold, color: gold });
+  page.drawText("Outside Nairobi transport is agreed during booking. Host provides lunch for all ushers.", { x: 42, y: 47, size: 8, font, color: gray });
+  page.drawText("Nairobi, Kenya  |  0112 836 281  |  Smartushering@gmail.com", { x: 42, y: 28, size: 8, font: bold, color: navy });
+
+  pdf.setTitle("Smart Ushering Rate Card");
+  pdf.setSubject("Current Smart Ushering packages and prices");
+  return pdf.save();
+}
+
+export function RateCardPreview({ packages, transport, onClose }: Props) {
+  const [zoom, setZoom] = useState(0.72);
+  const [downloading, setDownloading] = useState(false);
+
+  const download = async () => {
+    setDownloading(true);
+    try {
+      const bytes = await createRateCardPdf(packages, transport);
+      const pdfBuffer = new Uint8Array(bytes).buffer;
+      const blob = new Blob([pdfBuffer], { type: "application/pdf" });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement("a");
+      anchor.href = url;
+      anchor.download = `Smart-Ushering-Rate-Card-${new Date().toISOString().slice(0, 10)}.pdf`;
+      anchor.click();
+      URL.revokeObjectURL(url);
+      toast.success("Current rate card downloaded");
+    } catch {
+      toast.error("Rate card download failed");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col bg-primary/95" role="dialog" aria-modal="true" aria-label="Rate card preview">
+      <div className="flex min-h-14 flex-wrap items-center justify-between gap-2 border-b border-primary-foreground/20 bg-primary px-3 py-2 text-primary-foreground sm:px-5">
+        <div>
+          <div className="font-display text-base font-semibold">Current rate card</div>
+          <div className="text-[11px] text-primary-foreground/65">{Math.round(zoom * 100)}% · {packages.length} packages</div>
+        </div>
+        <div className="flex items-center gap-1.5">
+          <Button variant="ghost" size="icon" onClick={() => setZoom((value) => Math.max(0.45, value - 0.1))} className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" aria-label="Zoom out" title="Zoom out"><Minus /></Button>
+          <Button variant="ghost" size="icon" onClick={() => setZoom((value) => Math.min(1.35, value + 0.1))} className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" aria-label="Zoom in" title="Zoom in"><Plus /></Button>
+          <Button variant="ghost" size="icon" onClick={() => setZoom(0.72)} className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" aria-label="Reset zoom" title="Reset zoom"><RotateCcw /></Button>
+          <Button onClick={download} disabled={downloading} className="bg-gold text-gold-foreground hover:bg-gold/90"><Download />{downloading ? "Preparing…" : "Download PDF"}</Button>
+          <Button variant="ghost" size="icon" onClick={onClose} className="text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" aria-label="Close preview" title="Close preview"><X /></Button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-auto p-4 sm:p-8">
+        <div className="mx-auto origin-top bg-background shadow-2xl" style={{ width: 794, minHeight: 1123, transform: `scale(${zoom})`, marginBottom: `${1123 * (zoom - 1)}px` }}>
+          <header className="bg-navy px-14 py-12 text-primary-foreground">
+            <div className="font-display text-3xl font-bold text-gold">SMART USHERING</div>
+            <div className="mt-2 text-sm font-semibold">PROFESSIONAL USHERING RATE CARD</div>
+            <div className="mt-1 text-xs text-primary-foreground/70">Every Guest Matters. Every Event Counts.</div>
+          </header>
+          <main className="px-14 py-10">
+            <div className="mb-6 flex items-end justify-between border-b border-gold pb-3">
+              <h2 className="font-display text-lg font-semibold text-navy">Current packages</h2>
+              <span className="text-xs text-muted-foreground">Rates per usher / event day</span>
+            </div>
+            <div className="space-y-4">
+              {packages.map((pkg) => (
+                <section key={pkg.id} className="border-l-4 border-gold bg-cream px-6 py-5">
+                  <div className="flex items-start justify-between gap-8">
+                    <div className="min-w-0">
+                      <h3 className="font-display text-xl font-semibold text-navy">{pkg.name}</h3>
+                      <p className="mt-1 text-xs leading-5 text-muted-foreground">{pkg.description}</p>
+                    </div>
+                    <div className="shrink-0 text-right">
+                      <div className="font-display text-2xl font-bold text-navy">KES {pkg.price_kes.toLocaleString()}</div>
+                      <div className="text-[10px] font-semibold uppercase text-gold">Per usher / event day</div>
+                    </div>
+                  </div>
+                  <ul className="mt-3 grid grid-cols-2 gap-x-6 gap-y-1.5 text-xs text-foreground">
+                    {getFeatures(pkg.features).map((feature) => <li key={feature} className="flex gap-2"><span className="text-gold">●</span><span>{feature}</span></li>)}
+                  </ul>
+                </section>
+              ))}
+            </div>
+            <div className="mt-6 flex items-center justify-between bg-navy px-5 py-4 text-primary-foreground">
+              <span className="text-xs font-semibold uppercase">Transport within Nairobi</span>
+              <strong className="text-gold">KES {Number(transport || 0).toLocaleString()} per usher / event day</strong>
+            </div>
+            <p className="mt-4 text-xs text-muted-foreground">Outside Nairobi transport is agreed during booking. Host provides lunch for all ushers.</p>
+          </main>
+          <footer className="mx-14 mt-5 border-t pt-4 text-xs font-semibold text-navy">Nairobi, Kenya · 0112 836 281 · Smartushering@gmail.com</footer>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -3,12 +3,22 @@ import { useServerFn } from "@tanstack/react-start";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
+import { Eye, Save } from "lucide-react";
 import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
+import { RateCardPreview } from "@/components/RateCardPreview";
+import { Button } from "@/components/ui/button";
 import { adminUpdatePricing, adminUpdateSetting } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/pricing")({
-  head: () => ({ meta: [{ title: "Pricing — Admin" }] }),
+  head: () => ({ meta: [
+    { title: "Pricing & Rate Cards — Smart Ushering Admin" },
+    { name: "description", content: "Manage Smart Ushering package prices and download the current branded rate card." },
+    { property: "og:title", content: "Pricing & Rate Cards — Smart Ushering Admin" },
+    { property: "og:description", content: "Manage Smart Ushering package prices and download the current branded rate card." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 
@@ -29,6 +39,7 @@ function Page() {
   });
   const [prices, setPrices] = useState<Record<string, number>>({});
   const [transport, setTransport] = useState("200");
+  const [showRateCard, setShowRateCard] = useState(false);
 
   useEffect(() => {
     if (!data) return;
@@ -45,7 +56,7 @@ function Page() {
         updateSetting({ data: { token, key: "transport_nairobi_kes", value: transport } }),
       ]);
       toast.success("Pricing updated. Changes reflect site-wide.");
-      qc.invalidateQueries({ queryKey: ["admin-pricing"] });
+      await qc.invalidateQueries({ queryKey: ["admin-pricing"] });
       qc.invalidateQueries({ queryKey: ["pricing"] });
       qc.invalidateQueries({ queryKey: ["book-data"] });
     } catch (e) { toast.error(e instanceof Error ? e.message : "Failed"); }
@@ -53,7 +64,20 @@ function Page() {
 
   return (
     <AdminLayout>
-      <h1 className="font-display text-3xl font-semibold text-navy">Pricing Management</h1>
+      {showRateCard && (
+        <RateCardPreview
+          packages={data.packages.map((p) => ({ ...p, price_kes: prices[p.id] ?? p.price_kes }))}
+          transport={transport}
+          onClose={() => setShowRateCard(false)}
+        />
+      )}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <h1 className="font-display text-3xl font-semibold text-navy">Pricing Management</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Update package rates, then preview or download the current rate card.</p>
+        </div>
+        <Button variant="outline" onClick={() => setShowRateCard(true)}><Eye /> Preview rate card</Button>
+      </div>
       <div className="mt-6 space-y-4">
         {data.packages.map((p) => (
           <div key={p.id} className="rounded-xl border bg-white p-5">
@@ -82,7 +106,10 @@ function Page() {
             </div>
           </div>
         </div>
-        <button onClick={saveAll} className="rounded-md bg-navy px-6 py-3 text-sm font-semibold text-primary-foreground">Save all changes</button>
+        <div className="flex flex-wrap gap-3">
+          <Button onClick={saveAll} size="lg"><Save /> Save all changes</Button>
+          <Button variant="outline" onClick={() => setShowRateCard(true)} size="lg"><Eye /> Preview & download</Button>
+        </div>
       </div>
     </AdminLayout>
   );
