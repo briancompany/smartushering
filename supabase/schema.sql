@@ -241,8 +241,20 @@ VALUES
   ('chat-uploads', 'chat-uploads', false, 10485760),  -- 10MB, chat + visitor images
   ('gallery', 'gallery', false, 10485760),            -- 10MB, public gallery photos
   ('quotes', 'quotes', false, 20971520),              -- 20MB, generated PDF quotes
-  ('backups', 'backups', false, NULL)                 -- admin JSON backup snapshots
+  ('backups', 'backups', false, NULL),                -- admin JSON backup snapshots
+  ('avatars', 'avatars', false, 10485760)             -- 10MB, staff/admin profile pictures
 ON CONFLICT (id) DO NOTHING;
+
+-- Profile pictures
+ALTER TABLE public.admin_users ADD COLUMN IF NOT EXISTS avatar_url text;
+CREATE POLICY "Anyone can upload avatars" ON storage.objects FOR INSERT TO anon, authenticated
+  WITH CHECK (bucket_id = 'avatars');
+CREATE POLICY "Anyone can read avatars" ON storage.objects FOR SELECT TO anon, authenticated
+  USING (bucket_id = 'avatars');
+CREATE POLICY "Anyone can update avatars" ON storage.objects FOR UPDATE TO anon, authenticated
+  USING (bucket_id = 'avatars') WITH CHECK (bucket_id = 'avatars');
+CREATE POLICY "Anyone can delete avatars" ON storage.objects FOR DELETE TO anon, authenticated
+  USING (bucket_id = 'avatars');
 
 -- Gallery bucket access (admin panel uploads via its own login)
 CREATE POLICY "Anyone can upload gallery images" ON storage.objects FOR INSERT TO anon, authenticated
