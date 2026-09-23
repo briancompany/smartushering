@@ -70,9 +70,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [session, setSessionState] = useState<Session | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(null);
   const { location } = useRouterState();
   useInactivityLogout();
-  useEffect(() => { setSessionState(getSession()); }, []);
+  useEffect(() => { const s = getSession(); setSessionState(s); setAvatar(s?.avatar_url ?? null); }, []);
   const logout = () => { clearSession(); navigate({ to: "/admin/login" }); };
 
   const role = session?.role ?? "super_admin";
@@ -91,7 +92,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         </div>
         {session && (
           <div className="mx-3 mb-2 flex items-center gap-3 rounded-md bg-white/5 px-3 py-2.5 text-xs">
-            <AvatarUploader token={session.token} name={session.full_name ?? session.username} size={44} initialUrl={session.avatar_url ?? null} />
+            <AvatarUploader token={session.token} name={session.full_name ?? session.username} size={44} initialUrl={avatar} onChange={setAvatar} />
             <div className="min-w-0">
               <div className="truncate font-semibold text-primary-foreground">{session.full_name ?? session.username}</div>
               <div className="truncate text-primary-foreground/60">{ROLE_LABELS[session.role] ?? session.role}{session.is_department_head ? " • Head" : ""}</div>
@@ -120,7 +121,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           <span className="font-display font-semibold text-primary-foreground lg:hidden">Admin</span>
           <div className="ml-auto flex items-center gap-2">
             {session && <NotificationBell token={session.token} />}
-            {session && <ProfileAvatar url={session.avatar_url} name={session.full_name ?? session.username} size={32} />}
+            {session && <ProfileAvatar url={avatar} name={session.full_name ?? session.username} size={32} />}
             <button onClick={logout} className="hidden lg:flex items-center gap-1 rounded-md px-3 py-1.5 text-xs text-primary-foreground/80 hover:bg-white/10"><LogOut className="h-3.5 w-3.5" /> Logout</button>
           </div>
         </header>

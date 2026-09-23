@@ -55,9 +55,10 @@ export function AvatarUploader({
   useEffect(() => {
     let alive = true;
     fetchProfile({ data: { token } })
-      .then((p) => { if (alive) setUrl(p.avatar_url ?? null); })
+      .then((p) => { if (alive) { setUrl(p.avatar_url ?? null); onChange?.(p.avatar_url ?? null); } })
       .catch(() => {});
     return () => { alive = false; };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token, fetchProfile]);
 
   const pick = (file: File) => {
