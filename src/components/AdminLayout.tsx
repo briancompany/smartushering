@@ -120,6 +120,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           <span className="font-display font-semibold text-primary-foreground lg:hidden">Admin</span>
           <div className="ml-auto flex items-center gap-2">
             {session && <NotificationBell token={session.token} />}
+            {session && <ProfileAvatar url={session.avatar_url} name={session.full_name ?? session.username} size={32} />}
             <button onClick={logout} className="hidden lg:flex items-center gap-1 rounded-md px-3 py-1.5 text-xs text-primary-foreground/80 hover:bg-white/10"><LogOut className="h-3.5 w-3.5" /> Logout</button>
           </div>
         </header>

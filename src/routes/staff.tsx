@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Calendar as CalendarIcon, MapPin, Users, Megaphone, Package, MessageSquare, LogOut, AlertCircle, Bell, Ticket, ChevronLeft, ChevronRight, LifeBuoy } from "lucide-react";
 import { toast } from "sonner";
 import { getSession, clearSession } from "@/lib/auth-client";
+import { AvatarUploader } from "@/components/AvatarUploader";
 import {
   staffDashboard, listAnnouncements, markAnnouncementRead,
   listMyAssets, listMyGrievances, submitGrievance,
@@ -216,12 +217,17 @@ function Page() {
               <button onClick={logout} className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-primary-foreground/80 hover:bg-white/10"><LogOut className="h-3.5 w-3.5" /> Logout</button>
             </div>
           </div>
-          <h1 className="mt-4 font-display text-2xl font-semibold">Welcome back, {d?.me?.full_name ?? d?.me?.username ?? "Staff"}</h1>
+          <div className="mt-4 flex items-center gap-4">
+            <AvatarUploader token={token} name={d?.me?.full_name ?? d?.me?.username ?? "Staff"} size={64} />
+            <div>
+              <h1 className="font-display text-2xl font-semibold">Welcome back, {d?.me?.full_name ?? d?.me?.username ?? "Staff"}</h1>
           <div className="mt-1 text-xs text-primary-foreground/70">
             {d?.me?.staff_id && <>Staff ID: <span className="text-gold">{d.me.staff_id}</span> • </>}
             Role: <span className="capitalize">{d?.me?.role?.replace("_", " ")}</span>
             {d?.me?.department && <> • Dept: {d.me.department}</>}
             <> • Status: <span className={d?.me?.is_active ? "text-emerald-400" : "text-rose-400"}>{d?.me?.is_active ? "Active" : "Inactive"}</span></>
+          </div>
+            </div>
           </div>
         </div>
       </header>
