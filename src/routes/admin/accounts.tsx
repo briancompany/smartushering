@@ -10,6 +10,7 @@ import {
   adminDeleteAccount, adminRevokeSession,
 } from "@/lib/admin.functions";
 import { ROLE_LABELS, getSession } from "@/lib/auth-client";
+import { ProfileAvatar } from "@/components/AvatarUploader";
 
 export const Route = createFileRoute("/admin/accounts")({
   head: () => ({ meta: [{ title: "Accounts — Admin" }] }),
@@ -127,6 +128,7 @@ function Page() {
               return (
                 <tr key={a.id} className={`border-t ${deactivated ? "opacity-50" : ""}`}>
                   <td className="px-4 py-3 font-medium">
+                    <ProfileAvatar url={a.avatar_url} name={a.full_name ?? a.username} size={32} className="mr-2 inline-grid align-middle" />
                     {a.full_name ?? "—"} <span className="text-xs text-muted-foreground">(@{a.username})</span>
                     {a.is_department_head && <span className="ml-2 rounded bg-gold/20 px-1.5 py-0.5 text-[10px] font-semibold text-navy">HEAD</span>}
                   </td>

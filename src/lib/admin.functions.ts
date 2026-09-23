@@ -17,13 +17,14 @@ export type AdminSession = {
   is_department_head: boolean;
   department: string | null;
   full_name: string | null;
+  avatar_url: string | null;
 };
 
-async function requireAdmin(token: string): Promise<AdminSession> {
+export async function requireAdmin(token: string): Promise<AdminSession> {
   if (!token) throw new Error("Unauthorized");
   const { data } = await supabaseAdmin
     .from("admin_users")
-    .select("id, username, session_expires_at, role, is_super_admin, is_department_head, department, full_name, is_active")
+    .select("id, username, session_expires_at, role, is_super_admin, is_department_head, department, full_name, is_active, avatar_url")
     .eq("session_token", token)
     .maybeSingle();
   if (!data) throw new Error("Unauthorized");
@@ -39,6 +40,7 @@ async function requireAdmin(token: string): Promise<AdminSession> {
     id: data.id, username: data.username, role: data.role,
     is_super_admin: data.is_super_admin, is_department_head: data.is_department_head,
     department: data.department, full_name: data.full_name,
+    avatar_url: data.avatar_url ?? null,
   };
 }
 
@@ -86,6 +88,7 @@ export const adminLogin = createServerFn({ method: "POST" })
       remember_me_until: data.remember ? new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString() : null,
     }).eq("id", user.id);
     await supabaseAdmin.from("admin_login_attempts").insert({ username: data.identifier, success: true });
+    const { data: prof } = await supabaseAdmin.from("admin_users").select("avatar_url").eq("id", user.id).maybeSingle();
     await logAudit({ actor: user.username, action: "admin.login", entity: "admin_user", entity_id: user.id });
     return {
       token,
@@ -95,6 +98,7 @@ export const adminLogin = createServerFn({ method: "POST" })
       is_department_head: user.is_department_head,
       department: user.department,
       full_name: user.full_name,
+      avatar_url: prof?.avatar_url ?? null,
     };
   });
 
@@ -302,7 +306,7 @@ export const adminListAccounts = createServerFn({ method: "POST" })
     await requireSuperAdmin(data.token);
     const { data: rows } = await supabaseAdmin
       .from("admin_users")
-      .select("id, username, full_name, staff_id, phone, email, role, department, is_super_admin, is_department_head, is_active, created_at, last_active_at")
+      .select("id, username, full_name, staff_id, phone, email, role, department, is_super_admin, is_department_head, is_active, created_at, last_active_at, avatar_url")
       .order("created_at", { ascending: false });
     return rows ?? [];
   });
@@ -406,4 +410,26 @@ export const adminDeleteAccount = createServerFn({ method: "POST" })
     if (error) throw new Error(error.message);
     await logAudit({ actor: admin.username, action: "account.delete", entity: "admin_user", entity_id: data.id });
     return { ok: true };
+  });
+
+/* ---------------- Profile picture ---------------- */
+export const getMyProfile = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({ token: z.string().min(1) }).parse(d))
+  .handler(async ({ data }) => {
+    const me = await requireAdmin(data.token);
+    return { id: me.id, username: me.username, full_name: me.full_name, avatar_url: me.avatar_url };
+  });
+
+export const updateMyAvatar = createServerFn({ method: "POST" })
+  .inputValidator((d) => z.object({
+    token: z.string().min(1),
+    avatar_url: z.string().url().max(2000).nullable(),
+  }).parse(d))
+  .handler(async ({ data }) => {
+    const me = await requireAdmin(data.token);
+    const { error } = await supabaseAdmin
+      .from("admin_users").update({ avatar_url: data.avatar_url }).eq("id", me.id);
+    if (error) throw new Error(error.message);
+    await logAudit({ actor: me.username, action: "profile.avatar_update", entity: "admin_user", entity_id: me.id });
+    return { ok: true, avatar_url: data.avatar_url };
   });

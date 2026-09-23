@@ -7,6 +7,7 @@ export type Session = {
   is_department_head: boolean;
   department: string | null;
   full_name: string | null;
+  avatar_url?: string | null;
 };
 
 const KEY = "su_admin_session";

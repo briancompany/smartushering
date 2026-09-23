@@ -40,6 +40,7 @@ export type Database = {
       }
       admin_users: {
         Row: {
+          avatar_url: string | null
           created_at: string
           created_by: string | null
           department: string | null
@@ -62,6 +63,7 @@ export type Database = {
           username: string
         }
         Insert: {
+          avatar_url?: string | null
           created_at?: string
           created_by?: string | null
           department?: string | null
@@ -84,6 +86,7 @@ export type Database = {
           username: string
         }
         Update: {
+          avatar_url?: string | null
           created_at?: string
           created_by?: string | null
           department?: string | null

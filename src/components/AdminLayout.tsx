@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ReactNode } from "react";
 import { LayoutDashboard, Calendar, DollarSign, Wrench, Image as ImageIcon, MessageSquare, HelpCircle, LogOut, ArrowLeft, Menu, X, Users, ClipboardCheck, FileText, BarChart3, ShieldCheck, Mail, Star, Database, UserCog, Megaphone, Package, AlertTriangle, Flame, LifeBuoy } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
+import { AvatarUploader, ProfileAvatar } from "./AvatarUploader";
 import { getSession, clearSession, canAccess, ROLE_LABELS, type Session } from "@/lib/auth-client";
 import { adminVerify } from "@/lib/admin.functions";
 
@@ -69,9 +70,10 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [session, setSessionState] = useState<Session | null>(null);
+  const [avatar, setAvatar] = useState<string | null>(null);
   const { location } = useRouterState();
   useInactivityLogout();
-  useEffect(() => { setSessionState(getSession()); }, []);
+  useEffect(() => { const s = getSession(); setSessionState(s); setAvatar(s?.avatar_url ?? null); }, []);
   const logout = () => { clearSession(); navigate({ to: "/admin/login" }); };
 
   const role = session?.role ?? "super_admin";
@@ -89,9 +91,12 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           <button className="lg:hidden" onClick={() => setOpen(false)}><X className="h-5 w-5" /></button>
         </div>
         {session && (
-          <div className="mx-3 mb-2 rounded-md bg-white/5 px-3 py-2 text-xs">
-            <div className="font-semibold text-primary-foreground">{session.full_name ?? session.username}</div>
-            <div className="text-primary-foreground/60">{ROLE_LABELS[session.role] ?? session.role}{session.is_department_head ? " • Head" : ""}</div>
+          <div className="mx-3 mb-2 flex items-center gap-3 rounded-md bg-white/5 px-3 py-2.5 text-xs">
+            <AvatarUploader token={session.token} name={session.full_name ?? session.username} size={44} initialUrl={avatar} onChange={setAvatar} />
+            <div className="min-w-0">
+              <div className="truncate font-semibold text-primary-foreground">{session.full_name ?? session.username}</div>
+              <div className="truncate text-primary-foreground/60">{ROLE_LABELS[session.role] ?? session.role}{session.is_department_head ? " • Head" : ""}</div>
+            </div>
           </div>
         )}
         <nav className="max-h-[calc(100vh-200px)] space-y-1 overflow-y-auto px-3 pb-24">
@@ -116,6 +121,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
           <span className="font-display font-semibold text-primary-foreground lg:hidden">Admin</span>
           <div className="ml-auto flex items-center gap-2">
             {session && <NotificationBell token={session.token} />}
+            {session && <ProfileAvatar url={avatar} name={session.full_name ?? session.username} size={32} />}
             <button onClick={logout} className="hidden lg:flex items-center gap-1 rounded-md px-3 py-1.5 text-xs text-primary-foreground/80 hover:bg-white/10"><LogOut className="h-3.5 w-3.5" /> Logout</button>
           </div>
         </header>
