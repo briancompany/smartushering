@@ -53,10 +53,10 @@ function Page() {
             <p className="mt-1 text-sm text-muted-foreground">Use your username, Staff ID, or phone number</p>
           </div>
           <form onSubmit={submit} className="mt-6 space-y-3">
-            <input required placeholder="Username, Staff ID, or Phone" autoFocus value={form.identifier} onChange={(e) => setForm({ ...form, identifier: e.target.value })} className="w-full rounded-md border px-3 py-2.5 text-sm" />
-            <input required type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="w-full rounded-md border px-3 py-2.5 text-sm" />
+            <input required disabled={!ready} placeholder="Username, Staff ID, or Phone" autoFocus value={form.identifier} onChange={(e) => setForm({ ...form, identifier: e.target.value })} className="w-full rounded-md border px-3 py-2.5 text-sm disabled:opacity-60" />
+            <input required disabled={!ready} type="password" placeholder="Password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="w-full rounded-md border px-3 py-2.5 text-sm disabled:opacity-60" />
             <label className="flex items-center gap-2 text-xs text-muted-foreground">
-              <input type="checkbox" checked={form.remember} onChange={(e) => setForm({ ...form, remember: e.target.checked })} />
+              <input type="checkbox" disabled={!ready} checked={form.remember} onChange={(e) => setForm({ ...form, remember: e.target.checked })} />
               Remember me for 30 days
             </label>
             <button type={ready ? "submit" : "button"} disabled={!ready || loading} className="w-full rounded-md bg-navy py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{!ready ? "Loading..." : loading ? "Signing in..." : "Sign in"}</button>
