@@ -1,4 +1,4 @@
-import { createServerFn } from "@tanstack/react-start";
+ import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { logAudit } from "./audit.server";
@@ -71,7 +71,6 @@ export const adminLogin = createServerFn({ method: "POST" })
     const user = Array.isArray(rows) ? rows[0] : null;
     if (error || !user) {
       await supabaseAdmin.from("admin_login_attempts").insert({ username: data.identifier, success: false });
-      // Differentiate: was the account inactive?
       const { data: chk } = await supabaseAdmin.from("admin_users")
         .select("is_active")
         .or(`username.eq.${data.identifier},staff_id.eq.${data.identifier},phone.eq.${data.identifier}`)
@@ -375,7 +374,6 @@ export const adminUpdateAccount = createServerFn({ method: "POST" })
     }
 
     if (Object.keys(upd).length > 0) {
-      // Deactivating? Also revoke any active session so they can't keep using a logged-in tab.
       if (upd.is_active === false) {
         await supabaseAdmin.from("admin_users").update({ session_token: null, session_expires_at: null, remember_me_until: null }).eq("id", data.id);
       }
@@ -413,6 +411,7 @@ export const adminDeleteAccount = createServerFn({ method: "POST" })
   });
 
 /* ---------------- Profile picture ---------------- */
+
 export const getMyProfile = createServerFn({ method: "POST" })
   .inputValidator((d) => z.object({ token: z.string().min(1) }).parse(d))
   .handler(async ({ data }) => {
@@ -430,6 +429,5 @@ export const updateMyAvatar = createServerFn({ method: "POST" })
     const { error } = await supabaseAdmin
       .from("admin_users").update({ avatar_url: data.avatar_url }).eq("id", me.id);
     if (error) throw new Error(error.message);
-    await logAudit({ actor: me.username, action: "profile.avatar_update", entity: "admin_user", entity_id: me.id });
-    return { ok: true, avatar_url: data.avatar_url };
+    return { ok: true };
   });
