@@ -1,13 +1,20 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
 import { adminLogin } from "@/lib/admin.functions";
 import { setSession } from "@/lib/auth-client";
 
 export const Route = createFileRoute("/admin/login")({
-  head: () => ({ meta: [{ title: "Sign in — Smart Ushering" }] }),
+  head: () => ({ meta: [
+    { title: "Admin Sign In — Smart Ushering" },
+    { name: "description", content: "Secure sign in for Smart Ushering administrators and staff." },
+    { property: "og:title", content: "Admin Sign In — Smart Ushering" },
+    { property: "og:description", content: "Secure sign in for Smart Ushering administrators and staff." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 
@@ -16,6 +23,9 @@ function Page() {
   const login = useServerFn(adminLogin);
   const [form, setForm] = useState({ identifier: "", password: "", remember: false });
   const [loading, setLoading] = useState(false);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => setReady(true), []);
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,7 +34,7 @@ function Page() {
       const res = await login({ data: form });
       setSession(res);
       toast.success("Welcome, " + (res.full_name ?? res.username));
-      navigate({ to: res.role === "staff" ? "/staff" : "/admin" });
+      await navigate({ to: res.role === "staff" ? "/staff" : "/admin", replace: true });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -49,7 +59,7 @@ function Page() {
               <input type="checkbox" checked={form.remember} onChange={(e) => setForm({ ...form, remember: e.target.checked })} />
               Remember me for 30 days
             </label>
-            <button disabled={loading} className="w-full rounded-md bg-navy py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{loading ? "Signing in..." : "Sign in"}</button>
+            <button type={ready ? "submit" : "button"} disabled={!ready || loading} className="w-full rounded-md bg-navy py-2.5 text-sm font-semibold text-primary-foreground disabled:opacity-50">{!ready ? "Loading..." : loading ? "Signing in..." : "Sign in"}</button>
           </form>
           <p className="mt-4 text-center text-xs text-muted-foreground">
             <Link to="/forgot-password" className="text-navy underline hover:text-gold">Forgot password?</Link>
