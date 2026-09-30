@@ -47,6 +47,22 @@ export async function generateQuotePdf(q: QuoteInput): Promise<{ path: string; s
   const gray = rgb(0.4, 0.4, 0.45);
 
   // Header
+  // Strip characters the PDF font can't encode (e.g. invisible direction marks
+  // pasted from phone contacts on mobile devices).
+  const cleanText = (s: string) =>
+    String(s ?? "")
+      .normalize("NFKD")
+      .replace(/[\u200B-\u200F\u202A-\u202E\u2060-\u206F\uFEFF]/g, "")
+      .replace(/[\u2018\u2019]/g, "'")
+      .replace(/[\u201C\u201D]/g, '"')
+      .replace(/[\u2013\u2014]/g, "-")
+      .replace(/\u2022/g, "\u2022")
+      .replace(/[^\x20-\x7E\xA0-\xFF\u2022\n]/g, "");
+  const origDraw = page.drawText.bind(page);
+  page.drawText = ((text: string, opts?: Parameters<typeof origDraw>[1]) => origDraw(cleanText(text), opts)) as typeof page.drawText;
+  const origWidth = { bold: bold.widthOfTextAtSize.bind(bold), font: font.widthOfTextAtSize.bind(font) };
+  bold.widthOfTextAtSize = ((t: string, s: number) => origWidth.bold(cleanText(t), s)) as typeof bold.widthOfTextAtSize;
+  font.widthOfTextAtSize = ((t: string, s: number) => origWidth.font(cleanText(t), s)) as typeof font.widthOfTextAtSize;
   page.drawRectangle({ x: 0, y: 782, width: 595, height: 60, color: navy });
   page.drawText("SMART USHERING", { x: 40, y: 810, size: 20, font: bold, color: gold });
   page.drawText("Every Guest Matters. Every Event Counts.", { x: 40, y: 794, size: 9, font, color: rgb(1, 1, 1) });
