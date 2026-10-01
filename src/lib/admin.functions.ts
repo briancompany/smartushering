@@ -22,11 +22,15 @@ export type AdminSession = {
 
 export async function requireAdmin(token: string): Promise<AdminSession> {
   if (!token) throw new Error("Unauthorized");
-  const { data } = await supabaseAdmin
-    .from("admin_users")
-    .select("id, username, session_expires_at, role, is_super_admin, is_department_head, department, full_name, is_active, avatar_url")
-    .eq("session_token", token)
-    .maybeSingle();
+  const base = "id, username, session_expires_at, role, is_super_admin, is_department_head, department, full_name, is_active";
+  let res = await supabaseAdmin.from("admin_users").select(`${base}, avatar_url`).eq("session_token", token).maybeSingle();
+  if (res.error) {
+    // Fallback for databases missing newer columns (e.g. avatar_url) — never lock admins out.
+    console.error("[requireAdmin] select failed, retrying without avatar_url:", res.error.message);
+    res = (await supabaseAdmin.from("admin_users").select(base).eq("session_token", token).maybeSingle()) as typeof res;
+  }
+  if (res.error) throw new Error("Temporary server issue, please retry");
+  const data = res.data as (NonNullable<typeof res.data> & { avatar_url?: string | null }) | null;
   if (!data) throw new Error("Unauthorized");
   if (!data.is_active) throw new Error("Account is not active. Contact admin.");
   if (data.session_expires_at && new Date(data.session_expires_at) < new Date()) {

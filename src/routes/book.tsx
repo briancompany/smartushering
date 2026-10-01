@@ -22,7 +22,7 @@ export const Route = createFileRoute("/book")({
   head: () => ({ meta: [{ title: "Book Event — Smart Ushering" }, { name: "description", content: "Book professional ushers for your event. Quick form, instant cost estimate." }], links: [{ rel: "canonical", href: "/book" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(q),
   component: Page,
-  errorComponent: ({ error }) => <div className="p-8">{error.message}</div>,
+  errorComponent: ({ error }) => <div className="p-8">{error instanceof Error ? error.message : String(error)}</div>,
 });
 
 function ref() {
