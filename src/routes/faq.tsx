@@ -13,7 +13,7 @@ export const Route = createFileRoute("/faq")({
   head: () => ({ meta: [{ title: "FAQ — Smart Ushering Kenya" }, { name: "description", content: "Answers to common questions about our ushering services." }], links: [{ rel: "canonical", href: "/faq" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(q),
   component: Page,
-  errorComponent: ({ error }) => <div className="p-8">{error.message}</div>,
+  errorComponent: ({ error }) => <div className="p-8">{error instanceof Error ? error.message : String(error)}</div>,
 });
 
 function Page() {

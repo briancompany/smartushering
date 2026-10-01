@@ -30,7 +30,7 @@ export const Route = createFileRoute("/")({
   }),
   loader: ({ context }) => context.queryClient.ensureQueryData(homeQuery),
   component: Home,
-  errorComponent: ({ error }) => <div className="p-8 text-center">Couldn't load: {error.message}</div>,
+  errorComponent: ({ error }) => <div className="p-8 text-center">Couldn't load: {error instanceof Error ? error.message : String(error)}</div>,
 });
 
 function Home() {

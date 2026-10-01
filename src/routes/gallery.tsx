@@ -15,7 +15,7 @@ export const Route = createFileRoute("/gallery")({
   head: () => ({ meta: [{ title: "Gallery — Smart Ushering Kenya" }, { name: "description", content: "Photos from weddings, conferences, VIP events and more across Kenya." }], links: [{ rel: "canonical", href: "/gallery" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(q),
   component: Page,
-  errorComponent: ({ error }) => <div className="p-8">{error.message}</div>,
+  errorComponent: ({ error }) => <div className="p-8">{error instanceof Error ? error.message : String(error)}</div>,
 });
 
 function Page() {
