@@ -43,9 +43,15 @@ export function useAdminToken() {
     if (s.role === "staff" && !s.is_super_admin) { navigate({ to: "/staff" }); return; }
     setToken(s.token);
     // Server-side verify: catches deactivated accounts and expired sessions.
-    verify({ data: { token: s.token } }).catch(() => {
-      clearSession();
-      navigate({ to: "/admin/login" });
+    // Only sign out on a definite auth failure — not on network/cold-start hiccups.
+    verify({ data: { token: s.token } }).catch((err: unknown) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/unauthorized|expired|not active/i.test(msg)) {
+        clearSession();
+        navigate({ to: "/admin/login" });
+      } else {
+        console.warn("[admin] session check failed, staying signed in:", msg);
+      }
     });
   }, [navigate, verify]);
   return token;
