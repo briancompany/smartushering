@@ -5,7 +5,13 @@ import { toast } from "sonner";
 import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 
 export const Route = createFileRoute("/admin/warmup")({
-  head: () => ({ meta: [{ title: "System Warm-up — Admin" }] }),
+  head: () => ({ meta: [{ title: "System Warm-up — Admin — Smart Ushering" },
+    { name: "description", content: "Manage system warm-up for Smart Ushering." },
+    { property: "og:title", content: "System Warm-up — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage system warm-up for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

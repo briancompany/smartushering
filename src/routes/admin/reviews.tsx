@@ -6,7 +6,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminListReviews, adminUpdateReview, adminDeleteReview } from "@/lib/reviews.functions";
 
 export const Route = createFileRoute("/admin/reviews")({
-  head: () => ({ meta: [{ title: "Reviews — Admin" }] }),
+  head: () => ({ meta: [{ title: "Reviews — Admin — Smart Ushering" },
+    { name: "description", content: "Manage reviews for Smart Ushering." },
+    { property: "og:title", content: "Reviews — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage reviews for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

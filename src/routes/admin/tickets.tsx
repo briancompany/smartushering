@@ -8,7 +8,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminListTickets, adminUpdateTicket, adminResetTicketPassword, adminGenerateTicketPassword, adminDeleteTicket } from "@/lib/tickets.functions";
 
 export const Route = createFileRoute("/admin/tickets")({
-  head: () => ({ meta: [{ title: "Support Tickets — Admin" }] }),
+  head: () => ({ meta: [{ title: "Support Tickets — Admin — Smart Ushering" },
+    { name: "description", content: "Manage support tickets for Smart Ushering." },
+    { property: "og:title", content: "Support Tickets — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage support tickets for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
   errorComponent: () => <div className="p-8">Failed to load tickets.</div>,
   notFoundComponent: () => <div className="p-8">Not found.</div>,

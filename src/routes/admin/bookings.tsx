@@ -9,7 +9,13 @@ import { adminDeleteBooking } from "@/lib/phase3.functions";
 import { Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin/bookings")({
-  head: () => ({ meta: [{ title: "Bookings — Admin" }] }),
+  head: () => ({ meta: [{ title: "Bookings — Admin — Smart Ushering" },
+    { name: "description", content: "Manage bookings for Smart Ushering." },
+    { property: "og:title", content: "Bookings — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage bookings for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

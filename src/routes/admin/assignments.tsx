@@ -8,7 +8,13 @@ import { adminListBookings } from "@/lib/admin.functions";
 import { adminListStaff, adminListAssignments, adminUpsertAssignment, adminDeleteAssignment } from "@/lib/admin-phase2.functions";
 
 export const Route = createFileRoute("/admin/assignments")({
-  head: () => ({ meta: [{ title: "Assignments — Admin" }] }),
+  head: () => ({ meta: [{ title: "Assignments — Admin — Smart Ushering" },
+    { name: "description", content: "Manage assignments for Smart Ushering." },
+    { property: "og:title", content: "Assignments — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage assignments for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

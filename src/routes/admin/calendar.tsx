@@ -6,7 +6,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminCalendar } from "@/lib/admin-phase2.functions";
 
 export const Route = createFileRoute("/admin/calendar")({
-  head: () => ({ meta: [{ title: "Calendar — Admin" }] }),
+  head: () => ({ meta: [{ title: "Calendar — Admin — Smart Ushering" },
+    { name: "description", content: "Manage calendar for Smart Ushering." },
+    { property: "og:title", content: "Calendar — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage calendar for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

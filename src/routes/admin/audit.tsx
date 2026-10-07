@@ -5,7 +5,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminListAudit } from "@/lib/admin-phase2.functions";
 
 export const Route = createFileRoute("/admin/audit")({
-  head: () => ({ meta: [{ title: "Audit Log — Admin" }] }),
+  head: () => ({ meta: [{ title: "Audit Log — Admin — Smart Ushering" },
+    { name: "description", content: "Manage audit log for Smart Ushering." },
+    { property: "og:title", content: "Audit Log — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage audit log for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

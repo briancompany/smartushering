@@ -9,6 +9,10 @@ export const Route = createFileRoute("/track")({
   head: () => ({ meta: [
     { title: "Track your booking — Smart Ushering" },
     { name: "description", content: "Check the live status of your event booking with your reference number." },
+    { property: "og:title", content: "Track your booking — Smart Ushering" },
+    { property: "og:description", content: "Check the live status of your event booking with your reference number." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
   ] }),
   component: Page,
 });

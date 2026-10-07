@@ -5,7 +5,13 @@ import { Download, MessageCircle, Phone } from "lucide-react";
 import { getQuoteByReference } from "@/lib/admin-phase2.functions";
 
 export const Route = createFileRoute("/quote/$reference")({
-  head: () => ({ meta: [{ title: "Your Quotation — Smart Ushering" }] }),
+  head: () => ({ meta: [{ title: "Your Quotation — Smart Ushering" },
+    { name: "description", content: "Access your quotation at Smart Ushering." },
+    { property: "og:title", content: "Your Quotation — Smart Ushering" },
+    { property: "og:description", content: "Access your quotation at Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

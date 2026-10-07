@@ -11,7 +11,13 @@ import { supabase } from "@/integrations/supabase/client";
 const DEFAULT_WA = "254112836281";
 
 export const Route = createFileRoute("/admin/quotes")({
-  head: () => ({ meta: [{ title: "Quotes — Admin" }] }),
+  head: () => ({ meta: [{ title: "Quotes — Admin — Smart Ushering" },
+    { name: "description", content: "Manage quotes for Smart Ushering." },
+    { property: "og:title", content: "Quotes — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage quotes for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

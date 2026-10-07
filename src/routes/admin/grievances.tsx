@@ -7,7 +7,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminListGrievances, adminRespondGrievance } from "@/lib/phase3.functions";
 
 export const Route = createFileRoute("/admin/grievances")({
-  head: () => ({ meta: [{ title: "Concerns — Admin" }] }),
+  head: () => ({ meta: [{ title: "Concerns — Admin — Smart Ushering" },
+    { name: "description", content: "Manage concerns for Smart Ushering." },
+    { property: "og:title", content: "Concerns — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage concerns for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

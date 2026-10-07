@@ -14,7 +14,13 @@ import { ProfileAvatar } from "@/components/AvatarUploader";
 import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/accounts")({
-  head: () => ({ meta: [{ title: "Accounts — Admin" }] }),
+  head: () => ({ meta: [{ title: "Accounts — Admin — Smart Ushering" },
+    { name: "description", content: "Manage accounts for Smart Ushering." },
+    { property: "og:title", content: "Accounts — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage accounts for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

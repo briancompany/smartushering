@@ -7,7 +7,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { WHATSAPP_URL } from "@/components/WhatsAppButton";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({ meta: [{ title: "Contact — Smart Ushering Kenya" }, { name: "description", content: "Get in touch with Smart Ushering: phone, WhatsApp and email." }], links: [{ rel: "canonical", href: "/contact" }] }),
+  head: () => ({ meta: [{ title: "Contact — Smart Ushering Kenya" }, { name: "description", content: "Get in touch with Smart Ushering: phone, WhatsApp and email." },
+    { property: "og:title", content: "Contact — Smart Ushering Kenya" },
+    { property: "og:description", content: "Get in touch with Smart Ushering: phone, WhatsApp and email." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ], links: [{ rel: "canonical", href: "https://smartushering.lovable.app/contact" }] }),
   component: Page,
 });
 

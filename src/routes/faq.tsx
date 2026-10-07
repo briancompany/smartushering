@@ -10,7 +10,12 @@ const q = queryOptions({
 });
 
 export const Route = createFileRoute("/faq")({
-  head: () => ({ meta: [{ title: "FAQ — Smart Ushering Kenya" }, { name: "description", content: "Answers to common questions about our ushering services." }], links: [{ rel: "canonical", href: "/faq" }] }),
+  head: () => ({ meta: [{ title: "FAQ — Smart Ushering Kenya" }, { name: "description", content: "Answers to common questions about our ushering services." },
+    { property: "og:title", content: "FAQ — Smart Ushering Kenya" },
+    { property: "og:description", content: "Answers to common questions about our ushering services." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ], links: [{ rel: "canonical", href: "https://smartushering.lovable.app/faq" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(q),
   component: Page,
   errorComponent: ({ error }) => <div className="p-8">{error instanceof Error ? error.message : String(error)}</div>,

@@ -7,7 +7,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminListStaff, adminUpsertStaff, adminDeleteStaff } from "@/lib/admin-phase2.functions";
 
 export const Route = createFileRoute("/admin/staff")({
-  head: () => ({ meta: [{ title: "Staff — Admin" }] }),
+  head: () => ({ meta: [{ title: "Staff — Admin — Smart Ushering" },
+    { name: "description", content: "Manage staff for Smart Ushering." },
+    { property: "og:title", content: "Staff — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage staff for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

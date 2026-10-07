@@ -9,7 +9,13 @@ import { adminUpsertService, adminDeleteService } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/services")({
-  head: () => ({ meta: [{ title: "Services — Admin" }] }),
+  head: () => ({ meta: [{ title: "Services — Admin — Smart Ushering" },
+    { name: "description", content: "Manage services for Smart Ushering." },
+    { property: "og:title", content: "Services — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage services for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

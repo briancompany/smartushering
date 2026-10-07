@@ -5,7 +5,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminListNotifications } from "@/lib/admin-phase2.functions";
 
 export const Route = createFileRoute("/admin/notifications")({
-  head: () => ({ meta: [{ title: "Notifications — Admin" }] }),
+  head: () => ({ meta: [{ title: "Notifications — Admin — Smart Ushering" },
+    { name: "description", content: "Manage notifications for Smart Ushering." },
+    { property: "og:title", content: "Notifications — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage notifications for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

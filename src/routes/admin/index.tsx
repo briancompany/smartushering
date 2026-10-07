@@ -6,7 +6,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminGetDashboard } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin/")({
-  head: () => ({ meta: [{ title: "Admin Dashboard — Smart Ushering" }] }),
+  head: () => ({ meta: [{ title: "Admin Dashboard — Smart Ushering" },
+    { name: "description", content: "Manage admin dashboard for Smart Ushering." },
+    { property: "og:title", content: "Admin Dashboard — Smart Ushering" },
+    { property: "og:description", content: "Manage admin dashboard for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

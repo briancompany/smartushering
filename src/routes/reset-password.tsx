@@ -9,6 +9,11 @@ export const Route = createFileRoute("/reset-password")({
   head: () => ({ meta: [
     { title: "Set a new password — Smart Ushering" },
     { name: "robots", content: "noindex" },
+    { name: "description", content: "Access set a new password at Smart Ushering." },
+    { property: "og:title", content: "Set a new password — Smart Ushering" },
+    { property: "og:description", content: "Access set a new password at Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
   ] }),
   validateSearch: (s: Record<string, unknown>) => ({ token: typeof s.token === "string" ? s.token : "" }),
   component: Page,

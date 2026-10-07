@@ -5,7 +5,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminAnalytics } from "@/lib/admin-phase2.functions";
 
 export const Route = createFileRoute("/admin/analytics")({
-  head: () => ({ meta: [{ title: "Analytics — Admin" }] }),
+  head: () => ({ meta: [{ title: "Analytics — Admin — Smart Ushering" },
+    { name: "description", content: "Manage analytics for Smart Ushering." },
+    { property: "og:title", content: "Analytics — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage analytics for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

@@ -14,7 +14,13 @@ import {
 import { staffListMyTickets, staffSubmitTicket } from "@/lib/tickets.functions";
 
 export const Route = createFileRoute("/staff")({
-  head: () => ({ meta: [{ title: "Staff Dashboard — Smart Ushering" }] }),
+  head: () => ({ meta: [{ title: "Staff Dashboard — Smart Ushering" },
+    { name: "description", content: "Access staff dashboard at Smart Ushering." },
+    { property: "og:title", content: "Staff Dashboard — Smart Ushering" },
+    { property: "og:description", content: "Access staff dashboard at Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

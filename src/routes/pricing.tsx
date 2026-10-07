@@ -16,7 +16,12 @@ const q = queryOptions({
 });
 
 export const Route = createFileRoute("/pricing")({
-  head: () => ({ meta: [{ title: "Pricing — Smart Ushering Kenya" }, { name: "description", content: "Transparent per-usher pricing for weddings, corporate and VIP events across Kenya." }], links: [{ rel: "canonical", href: "/pricing" }] }),
+  head: () => ({ meta: [{ title: "Pricing — Smart Ushering Kenya" }, { name: "description", content: "Transparent per-usher pricing for weddings, corporate and VIP events across Kenya." },
+    { property: "og:title", content: "Pricing — Smart Ushering Kenya" },
+    { property: "og:description", content: "Transparent per-usher pricing for weddings, corporate and VIP events across Kenya." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ], links: [{ rel: "canonical", href: "https://smartushering.lovable.app/pricing" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(q),
   component: Page,
   errorComponent: ({ error }) => <div className="p-8">Couldn't load: {error instanceof Error ? error.message : String(error)}</div>,
