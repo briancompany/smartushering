@@ -87,8 +87,8 @@ export function AdminLayout({ children }: { children: ReactNode }) {
   const visible = NAV.filter((n) => canAccess(role, n.key, isSuper));
 
   return (
-    <div className="flex min-h-screen bg-cream">
-      <aside className={`fixed inset-y-0 left-0 z-40 w-64 transform gradient-navy text-primary-foreground transition-transform lg:static lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
+    <div className="flex min-h-screen min-w-0 w-full bg-cream">
+      <aside className={`fixed inset-y-0 left-0 z-40 w-64 max-w-full shrink-0 transform gradient-navy text-primary-foreground transition-transform lg:sticky lg:top-0 lg:h-dvh lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
         <div className="flex items-center justify-between p-5">
           <Link to="/" className="flex items-center gap-2">
             <img src="/icon-512.png" alt="" width={28} height={28} className="rounded" />
@@ -121,17 +121,17 @@ export function AdminLayout({ children }: { children: ReactNode }) {
         </div>
       </aside>
 
-      <div className="flex flex-1 flex-col">
-        <header className="flex items-center justify-between border-b bg-navy px-4 py-2.5 lg:px-6">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-3 border-b bg-navy px-4 py-2.5 lg:flex lg:px-6">
           <button className="lg:hidden text-primary-foreground" onClick={() => setOpen(true)}><Menu className="h-6 w-6" /></button>
           <span className="font-display font-semibold text-primary-foreground lg:hidden">Admin</span>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex shrink-0 items-center gap-2">
             {session && <NotificationBell token={session.token} />}
             {session && <ProfileAvatar url={avatar} name={session.full_name ?? session.username} size={32} />}
             <button onClick={logout} className="hidden lg:flex items-center gap-1 rounded-md px-3 py-1.5 text-xs text-primary-foreground/80 hover:bg-white/10"><LogOut className="h-3.5 w-3.5" /> Logout</button>
           </div>
         </header>
-        <main className="flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
+        <main className="min-w-0 w-full flex-1 p-4 sm:p-6 lg:p-8">{children}</main>
       </div>
     </div>
   );

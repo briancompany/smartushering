@@ -50,7 +50,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
   head: () => ({
     meta: [
       { charSet: "utf-8" },
-      { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "viewport", content: "width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" },
       { name: "theme-color", content: "#0B1929" },
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "black-translucent" },
@@ -66,8 +66,6 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:title", content: "Smart Ushering — Professional Ushering Services in Kenya" },
       { name: "twitter:description", content: "Premium ushering, guest management and event support across Kenya. 30+ trained professionals for weddings, corporate events and VIP functions." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/897b5d4f-1704-4664-ba9f-085aec938b7f/id-preview-c914e1b1--a069dc2c-9ad1-4b43-8196-ef063517468d.lovable.app-1780390919370.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/897b5d4f-1704-4664-ba9f-085aec938b7f/id-preview-c914e1b1--a069dc2c-9ad1-4b43-8196-ef063517468d.lovable.app-1780390919370.png" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },

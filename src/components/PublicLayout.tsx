@@ -6,9 +6,9 @@ import { ChatWidget } from "./ChatWidget";
 
 export function PublicLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-background">
+    <div className="flex min-h-screen min-w-0 w-full flex-col bg-background">
       <SiteHeader />
-      <main className="flex-1">{children}</main>
+      <main className="min-w-0 w-full flex-1">{children}</main>
       <SiteFooter />
       <WhatsAppButton />
       <ChatWidget />
