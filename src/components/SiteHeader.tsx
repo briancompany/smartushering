@@ -20,18 +20,18 @@ export function SiteHeader() {
   const [open, setOpen] = useState(false);
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/85 backdrop-blur-md">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <Link to="/" className="flex items-center gap-2.5">
-          <div className="grid h-10 w-10 place-items-center rounded-md bg-navy">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-[minmax(0,1fr)_auto] items-center gap-3 px-4 py-4 sm:px-6 2xl:flex 2xl:justify-between 2xl:px-8">
+        <Link to="/" className="flex min-w-0 items-center gap-2.5">
+          <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md bg-navy">
             <span className="font-display text-lg font-bold text-gold">S</span>
           </div>
-          <div className="leading-tight">
+          <div className="min-w-0 leading-tight">
             <div className="font-display text-lg font-semibold text-navy">Smart Ushering</div>
             <div className="text-[10px] uppercase tracking-[0.18em] text-gold">Every Guest Matters</div>
           </div>
         </Link>
 
-        <nav className="hidden items-center gap-7 lg:flex">
+        <nav className="hidden items-center gap-5 2xl:flex">
           {NAV.map((n) => (
             <Link
               key={n.to}
@@ -45,7 +45,7 @@ export function SiteHeader() {
           ))}
         </nav>
 
-        <div className="hidden items-center gap-3 lg:flex">
+        <div className="hidden shrink-0 items-center gap-3 2xl:flex">
           <a href="tel:+254112836281" className="flex items-center gap-2 text-sm font-medium text-navy">
             <Phone className="h-4 w-4 text-gold" /> 0112 836 281
           </a>
@@ -55,7 +55,7 @@ export function SiteHeader() {
           </Link>
         </div>
 
-        <div className="flex items-center gap-2 lg:hidden">
+        <div className="flex shrink-0 items-center gap-2 2xl:hidden">
           <PublicNotificationBell />
           <button onClick={() => setOpen((v) => !v)} aria-label="Menu">
             {open ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -64,7 +64,7 @@ export function SiteHeader() {
       </div>
 
       {open && (
-        <div className="border-t border-border/60 bg-background lg:hidden">
+        <div className="border-t border-border/60 bg-background 2xl:hidden">
           <div className="mx-auto flex max-w-7xl flex-col gap-1 px-4 py-3">
             {NAV.map((n) => (
               <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm font-medium hover:bg-cream" activeProps={{ className: "bg-cream text-navy" }}>

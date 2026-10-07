@@ -5,7 +5,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { adminListContacts } from "@/lib/admin-phase2.functions";
 
 export const Route = createFileRoute("/admin/messages")({
-  head: () => ({ meta: [{ title: "Messages — Admin" }] }),
+  head: () => ({ meta: [{ title: "Messages — Admin — Smart Ushering" },
+    { name: "description", content: "Manage messages for Smart Ushering." },
+    { property: "og:title", content: "Messages — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage messages for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

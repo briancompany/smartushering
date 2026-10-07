@@ -102,7 +102,27 @@
   }
   h1, h2, h3, h4, .font-display {
     font-family: var(--font-display);
-    letter-spacing: -0.01em;
+    letter-spacing: 0;
+  }
+}
+
+/* Shrink content tracks instead of letting intrinsic field/table widths
+   expand the document. Wide tables retain their own horizontal scrollbar. */
+@layer base {
+  html, body { min-width: 0; width: 100%; }
+  main, form, fieldset { min-width: 0; max-width: 100%; }
+  :where([class~="flex"], [class~="grid"]) > * { min-width: 0; }
+  :where(input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="hidden"]), select, textarea) {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+  :where(input[type="checkbox"], input[type="radio"], button svg) { flex-shrink: 0; }
+  :where(main p, main label, main h1, main h2, main h3) { overflow-wrap: anywhere; }
+  :where(.overflow-x-auto) { min-width: 0; max-width: 100%; }
+  @media (max-width: 767px) {
+    :where(input, select, textarea):not([type="checkbox"]):not([type="radio"]) { font-size: 1rem; }
+    main :where(button, a[role="button"]) { max-width: 100%; white-space: normal; overflow-wrap: anywhere; }
   }
 }
 

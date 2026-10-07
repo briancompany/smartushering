@@ -14,7 +14,13 @@ import {
 import { staffListMyTickets, staffSubmitTicket } from "@/lib/tickets.functions";
 
 export const Route = createFileRoute("/staff")({
-  head: () => ({ meta: [{ title: "Staff Dashboard — Smart Ushering" }] }),
+  head: () => ({ meta: [{ title: "Staff Dashboard — Smart Ushering" },
+    { name: "description", content: "Access staff dashboard at Smart Ushering." },
+    { property: "og:title", content: "Staff Dashboard — Smart Ushering" },
+    { property: "og:description", content: "Access staff dashboard at Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 
@@ -52,7 +58,7 @@ function StaffBell({ token }: { token: string }) {
       {open && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setOpen(false)} />
-          <div className="absolute right-0 z-50 mt-2 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-xl border bg-white text-navy shadow-luxury">
+          <div className="fixed inset-x-4 z-50 mt-2 max-h-[80dvh] overflow-y-auto rounded-lg border bg-card text-navy shadow-luxury sm:absolute sm:inset-x-auto sm:right-0 sm:w-80">
             <div className="flex items-center justify-between border-b bg-cream px-3 py-2 text-xs">
               <span className="font-semibold">Notifications</span>
               {unread.length > 0 && <button onClick={clearAll} className="text-navy underline">Mark all read</button>}
@@ -204,20 +210,20 @@ function Page() {
   const logout = () => { clearSession(); navigate({ to: "/admin/login" }); };
 
   return (
-    <div className="min-h-screen bg-cream pb-20">
+    <div className="min-h-screen min-w-0 w-full bg-cream pb-20">
       <header className="gradient-navy text-primary-foreground">
         <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
-          <div className="flex items-center justify-between gap-3">
-            <Link to="/" className="flex items-center gap-2">
-              <img src="/icon-512.png" alt="" width={32} height={32} className="rounded" />
+          <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3 sm:flex sm:justify-between">
+            <Link to="/" className="flex min-w-0 items-center gap-2">
+              <img src="/icon-512.png" alt="" width={32} height={32} className="shrink-0 rounded" />
               <span className="font-display text-lg font-semibold text-gold">Smart Ushering</span>
             </Link>
-            <div className="flex items-center gap-1">
+            <div className="flex shrink-0 items-center gap-1">
               <StaffBell token={token} />
               <button onClick={logout} className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-primary-foreground/80 hover:bg-white/10"><LogOut className="h-3.5 w-3.5" /> Logout</button>
             </div>
           </div>
-          <div className="mt-4 flex items-center gap-4">
+          <div className="mt-4 grid grid-cols-[auto_minmax(0,1fr)] items-center gap-4">
             <AvatarUploader token={token} name={d?.me?.full_name ?? d?.me?.username ?? "Staff"} size={64} />
             <div>
               <h1 className="font-display text-2xl font-semibold">Welcome back, {d?.me?.full_name ?? d?.me?.username ?? "Staff"}</h1>
@@ -232,7 +238,7 @@ function Page() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-6xl space-y-6 px-4 py-6 sm:px-6">
+        <div className="mx-auto min-w-0 w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6">
         <div className="flex flex-wrap gap-2">
           <button onClick={() => setOpen(true)} className="flex items-center gap-2 rounded-md bg-gold px-3 py-2 text-xs font-semibold text-gold-foreground"><AlertCircle className="h-4 w-4" /> Raise a Concern</button>
           <button onClick={() => setTkOpen(true)} className="flex items-center gap-2 rounded-md bg-navy px-3 py-2 text-xs font-semibold text-primary-foreground"><LifeBuoy className="h-4 w-4" /> Submit Support Ticket</button>

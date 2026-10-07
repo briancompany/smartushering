@@ -11,9 +11,16 @@ import {
 } from "@/lib/admin.functions";
 import { ROLE_LABELS, getSession } from "@/lib/auth-client";
 import { ProfileAvatar } from "@/components/AvatarUploader";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/admin/accounts")({
-  head: () => ({ meta: [{ title: "Accounts — Admin" }] }),
+  head: () => ({ meta: [{ title: "Accounts — Admin — Smart Ushering" },
+    { name: "description", content: "Manage accounts for Smart Ushering." },
+    { property: "og:title", content: "Accounts — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage accounts for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 
@@ -67,7 +74,7 @@ function Page() {
   const update = useServerFn(adminUpdateAccount);
   const del = useServerFn(adminDeleteAccount);
   const revoke = useServerFn(adminRevokeSession);
-  const { data = [] } = useQuery({ queryKey: ["accounts", token], queryFn: () => list({ data: { token: token! } }), enabled: !!token, staleTime: 30_000 });
+  const { data = [] } = useQuery({ queryKey: ["accounts", token], queryFn: () => token ? list({ data: { token } }) : Promise.resolve([]), enabled: !!token, staleTime: 30_000 });
   const me = getSession();
   const [form, setForm] = useState({
     full_name: "", username: "", staff_id: "", phone: "", email: "", password: "",
@@ -101,39 +108,52 @@ function Page() {
       <h1 className="font-display text-3xl font-semibold text-navy">Accounts & roles</h1>
       <p className="text-sm text-muted-foreground">Create staff/admin accounts and send WhatsApp login instructions. Staff sign in with username, email, or phone.</p>
 
-      <form onSubmit={submit} className="mt-6 grid gap-3 rounded-xl border bg-white p-4 sm:grid-cols-2 lg:grid-cols-4">
-        <input required placeholder="Full name" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
-        <input required placeholder="Username" value={form.username} onChange={(e) => setForm({ ...form, username: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
-        <input required placeholder="Staff ID (e.g. SU-001)" value={form.staff_id} onChange={(e) => setForm({ ...form, staff_id: e.target.value.toUpperCase() })} className="rounded-md border px-3 py-2 text-sm" />
-        <input required placeholder="Phone (07…)" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
-        <input required type="email" placeholder="Email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
-        <input required type="password" placeholder="Temporary password (min 8)" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
-        <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as Role })} className="rounded-md border px-3 py-2 text-sm">
-          {ROLES.map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
-        </select>
-        <input placeholder="Department (optional)" value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} className="rounded-md border px-3 py-2 text-sm" />
-        <label className="flex items-center gap-2 rounded-md border px-3 py-2 text-sm sm:col-span-2">
+      <form onSubmit={submit} className="mx-auto mt-6 grid w-full min-w-0 max-w-6xl grid-cols-1 gap-4 rounded-lg border bg-card p-4 sm:grid-cols-2 2xl:grid-cols-4">
+        {([
+          ["full_name", "Full name", "text", "Full name"],
+          ["username", "Username", "text", "Username"],
+          ["staff_id", "Staff ID", "text", "e.g. SU-001"],
+          ["phone", "Phone", "tel", "07…"],
+          ["email", "Email", "email", "Email address"],
+          ["password", "Temporary password", "password", "Minimum 8 characters"],
+        ] as const).map(([key, label, type, placeholder]) => (
+          <label key={key} className="grid min-w-0 gap-1.5 text-sm font-medium">
+            {label}
+            <input required type={type} minLength={key === "password" ? 8 : undefined} placeholder={placeholder} value={form[key]} onChange={(e) => setForm({ ...form, [key]: key === "staff_id" ? e.target.value.toUpperCase() : e.target.value })} className="min-w-0 w-full rounded-md border bg-background px-3 py-2 font-normal" />
+          </label>
+        ))}
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium">
+          Role
+          <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value as Role })} className="min-w-0 w-full rounded-md border bg-background px-3 py-2 font-normal">
+            {ROLES.map((r) => <option key={r} value={r}>{ROLE_LABELS[r]}</option>)}
+          </select>
+        </label>
+        <label className="grid min-w-0 gap-1.5 text-sm font-medium">
+          Department (optional)
+          <input placeholder="Department" value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} className="min-w-0 w-full rounded-md border bg-background px-3 py-2 font-normal" />
+        </label>
+        <label className="flex min-w-0 items-center gap-2 rounded-md border px-3 py-2 text-sm sm:col-span-2">
           <input type="checkbox" checked={form.is_department_head} onChange={(e) => setForm({ ...form, is_department_head: e.target.checked })} />
           Set as Department Head
         </label>
-        <button className="rounded-md bg-navy px-3 py-2 text-sm font-semibold text-primary-foreground sm:col-span-2 lg:col-span-2">Create account</button>
+        <Button type="submit" className="h-auto min-w-0 w-full py-2 sm:col-span-2">Create account</Button>
       </form>
 
-      <div className="mt-4 overflow-x-auto rounded-xl border bg-white">
-        <table className="w-full text-sm">
+      <div role="region" aria-label="Accounts table" tabIndex={0} className="mt-4 min-w-0 w-full overflow-x-auto rounded-lg border bg-card">
+        <table className="w-full min-w-[60rem] text-sm">
           <thead className="bg-cream text-left text-xs uppercase text-muted-foreground"><tr>{["Name","Staff ID","Email / Phone","Role","Status","Actions"].map((h) => <th key={h} className="px-4 py-3">{h}</th>)}</tr></thead>
           <tbody>
             {data.map((a) => {
               const deactivated = !a.is_active;
               return (
                 <tr key={a.id} className={`border-t ${deactivated ? "opacity-50" : ""}`}>
-                  <td className="px-4 py-3 font-medium">
+                  <td className="max-w-64 break-words px-4 py-3 font-medium">
                     <ProfileAvatar url={a.avatar_url} name={a.full_name ?? a.username} size={32} className="mr-2 inline-grid align-middle" />
                     {a.full_name ?? "—"} <span className="text-xs text-muted-foreground">(@{a.username})</span>
                     {a.is_department_head && <span className="ml-2 rounded bg-gold/20 px-1.5 py-0.5 text-[10px] font-semibold text-navy">HEAD</span>}
                   </td>
                   <td className="px-4 py-3 font-mono text-xs">{a.staff_id ?? "—"}</td>
-                  <td className="px-4 py-3 text-xs">
+                  <td className="max-w-64 break-all px-4 py-3 text-xs">
                     <div>{a.email ?? "—"}</div>
                     <div className="text-muted-foreground">{a.phone ?? "—"}</div>
                   </td>
@@ -143,12 +163,12 @@ function Page() {
                     : <span className="rounded-full bg-rose-100 px-2 py-0.5 text-xs text-rose-700">Deactivated</span>}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex min-w-0 flex-wrap gap-1">
                       {a.phone && a.full_name && (
                         <button
                           onClick={() => openWhatsApp({
-                            full_name: a.full_name!, username: a.username,
-                            phone: a.phone!, email: a.email ?? null,
+                            full_name: a.full_name ?? a.username, username: a.username,
+                            phone: a.phone ?? "", email: a.email ?? null,
                           })}
                           className="inline-flex items-center gap-1 rounded-md bg-emerald-600 px-2 py-1 text-[11px] font-semibold text-white">
                           <MessageCircle className="h-3 w-3" /> WhatsApp

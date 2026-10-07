@@ -9,7 +9,13 @@ import { adminListAssets, adminUpsertAsset, adminDeleteAsset, adminSetAssetStatu
 import { adminListAccounts } from "@/lib/admin.functions";
 
 export const Route = createFileRoute("/admin/assets")({
-  head: () => ({ meta: [{ title: "Assets — Admin" }] }),
+  head: () => ({ meta: [{ title: "Assets — Admin — Smart Ushering" },
+    { name: "description", content: "Manage assets for Smart Ushering." },
+    { property: "og:title", content: "Assets — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage assets for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

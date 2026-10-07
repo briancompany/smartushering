@@ -11,7 +11,13 @@ import { supabase } from "@/integrations/supabase/client";
 const CATEGORIES = ["Weddings", "Conferences", "Corporate Events", "Graduations", "VIP Events", "Funerals", "Brand Activations"];
 
 export const Route = createFileRoute("/admin/gallery")({
-  head: () => ({ meta: [{ title: "Gallery — Admin" }] }),
+  head: () => ({ meta: [{ title: "Gallery — Admin — Smart Ushering" },
+    { name: "description", content: "Manage gallery for Smart Ushering." },
+    { property: "og:title", content: "Gallery — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage gallery for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

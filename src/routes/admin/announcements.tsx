@@ -8,7 +8,13 @@ import { AdminLayout, useAdminToken } from "@/components/AdminLayout";
 import { listAnnouncements, adminUpsertAnnouncement, adminDeleteAnnouncement } from "@/lib/phase3.functions";
 
 export const Route = createFileRoute("/admin/announcements")({
-  head: () => ({ meta: [{ title: "Announcements — Admin" }] }),
+  head: () => ({ meta: [{ title: "Announcements — Admin — Smart Ushering" },
+    { name: "description", content: "Manage announcements for Smart Ushering." },
+    { property: "og:title", content: "Announcements — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage announcements for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

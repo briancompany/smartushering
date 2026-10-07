@@ -13,7 +13,9 @@ export const Route = createFileRoute("/reviews")({
       { name: "description", content: "Read genuine reviews from Smart Ushering clients across Kenya and share your own experience with our professional event ushers." },
       { property: "og:title", content: "Customer Reviews — Smart Ushering" },
       { property: "og:description", content: "Hear from clients who trusted Smart Ushering for their weddings, corporate galas, and VIP events." },
-    ],
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ],
   }),
   component: Page,
 });

@@ -12,7 +12,12 @@ const q = queryOptions({
 });
 
 export const Route = createFileRoute("/gallery")({
-  head: () => ({ meta: [{ title: "Gallery — Smart Ushering Kenya" }, { name: "description", content: "Photos from weddings, conferences, VIP events and more across Kenya." }], links: [{ rel: "canonical", href: "/gallery" }] }),
+  head: () => ({ meta: [{ title: "Gallery — Smart Ushering Kenya" }, { name: "description", content: "Photos from weddings, conferences, VIP events and more across Kenya." },
+    { property: "og:title", content: "Gallery — Smart Ushering Kenya" },
+    { property: "og:description", content: "Photos from weddings, conferences, VIP events and more across Kenya." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ], links: [{ rel: "canonical", href: "https://smartushering.lovable.app/gallery" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(q),
   component: Page,
   errorComponent: ({ error }) => <div className="p-8">{error instanceof Error ? error.message : String(error)}</div>,

@@ -11,7 +11,13 @@ import { supabase } from "@/integrations/supabase/client";
 type Msg = { id: string; sender: string; body: string | null; image_url: string | null; created_at: string };
 
 export const Route = createFileRoute("/admin/chats")({
-  head: () => ({ meta: [{ title: "Live Chats — Admin" }] }),
+  head: () => ({ meta: [{ title: "Live Chats — Admin — Smart Ushering" },
+    { name: "description", content: "Manage live chats for Smart Ushering." },
+    { property: "og:title", content: "Live Chats — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage live chats for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

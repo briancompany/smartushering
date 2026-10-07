@@ -9,6 +9,10 @@ export const Route = createFileRoute("/concerns")({
   head: () => ({ meta: [
     { title: "Submit a Concern — Smart Ushering" },
     { name: "description", content: "Send a confidential complaint, grievance, or feedback. Submit anonymously if you prefer." },
+    { property: "og:title", content: "Submit a Concern — Smart Ushering" },
+    { property: "og:description", content: "Send a confidential complaint, grievance, or feedback. Submit anonymously if you prefer." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
   ] }),
   component: Page,
 });

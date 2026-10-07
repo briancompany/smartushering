@@ -10,7 +10,13 @@ import {
 } from "@/lib/backups.functions";
 
 export const Route = createFileRoute("/admin/backups")({
-  head: () => ({ meta: [{ title: "Backups & Recovery — Admin" }] }),
+  head: () => ({ meta: [{ title: "Backups & Recovery — Admin — Smart Ushering" },
+    { name: "description", content: "Manage backups & recovery for Smart Ushering." },
+    { property: "og:title", content: "Backups & Recovery — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage backups & recovery for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

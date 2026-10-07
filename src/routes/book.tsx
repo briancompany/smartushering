@@ -19,7 +19,12 @@ const q = queryOptions({
 });
 
 export const Route = createFileRoute("/book")({
-  head: () => ({ meta: [{ title: "Book Event — Smart Ushering" }, { name: "description", content: "Book professional ushers for your event. Quick form, instant cost estimate." }], links: [{ rel: "canonical", href: "/book" }] }),
+  head: () => ({ meta: [{ title: "Book Event — Smart Ushering" }, { name: "description", content: "Book professional ushers for your event. Quick form, instant cost estimate." },
+    { property: "og:title", content: "Book Event — Smart Ushering" },
+    { property: "og:description", content: "Book professional ushers for your event. Quick form, instant cost estimate." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ], links: [{ rel: "canonical", href: "https://smartushering.lovable.app/book" }] }),
   loader: ({ context }) => context.queryClient.ensureQueryData(q),
   component: Page,
   errorComponent: ({ error }) => <div className="p-8">{error instanceof Error ? error.message : String(error)}</div>,

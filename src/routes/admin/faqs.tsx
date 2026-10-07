@@ -9,7 +9,13 @@ import { adminUpsertFaq, adminDeleteFaq } from "@/lib/admin.functions";
 import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/admin/faqs")({
-  head: () => ({ meta: [{ title: "FAQs — Admin" }] }),
+  head: () => ({ meta: [{ title: "FAQs — Admin — Smart Ushering" },
+    { name: "description", content: "Manage faqs for Smart Ushering." },
+    { property: "og:title", content: "FAQs — Admin — Smart Ushering" },
+    { property: "og:description", content: "Manage faqs for Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
+  ] }),
   component: Page,
 });
 

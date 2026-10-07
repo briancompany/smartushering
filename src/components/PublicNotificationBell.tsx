@@ -51,7 +51,7 @@ export function PublicNotificationBell() {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 z-50 mt-2 w-80 overflow-hidden rounded-xl border bg-white shadow-luxury">
+        <div className="fixed inset-x-4 z-50 mt-2 max-h-[80dvh] overflow-y-auto rounded-lg border bg-card shadow-luxury sm:absolute sm:inset-x-auto sm:right-0 sm:w-80">
           <div className="border-b bg-cream px-3 py-2 text-xs font-semibold uppercase text-navy">Announcements</div>
           <div className="max-h-96 overflow-y-auto">
             {data.length === 0 && <p className="p-4 text-sm text-muted-foreground">No announcements right now.</p>}

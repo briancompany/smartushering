@@ -9,6 +9,10 @@ export const Route = createFileRoute("/track-ticket")({
   head: () => ({ meta: [
     { title: "Track your ticket — Smart Ushering" },
     { name: "description", content: "Check the status of a support ticket you submitted to Smart Ushering." },
+    { property: "og:title", content: "Track your ticket — Smart Ushering" },
+    { property: "og:description", content: "Check the status of a support ticket you submitted to Smart Ushering." },
+    { property: "og:type", content: "website" },
+    { name: "twitter:card", content: "summary" },
   ] }),
   component: Page,
 });
