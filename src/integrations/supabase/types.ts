@@ -1265,6 +1265,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_promo: {
+        Args: { _code: string; _subtotal: number }
+        Returns: {
+          discount_kes: number
+          message: string
+          valid: boolean
+        }[]
+      }
       create_staff_account: {
         Args: {
           _created_by: string
@@ -1280,6 +1288,14 @@ export type Database = {
         }
         Returns: string
       }
+      get_unavailable_dates: {
+        Args: never
+        Returns: {
+          event_date: string
+          kind: string
+        }[]
+      }
+      redeem_promo: { Args: { _code: string }; Returns: undefined }
       update_account_password: {
         Args: { _id: string; _password: string }
         Returns: undefined
