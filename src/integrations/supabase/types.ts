@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      add_ons: {
+        Row: {
+          created_at: string
+          description: string
+          display_order: number
+          id: string
+          is_active: boolean
+          name: string
+          price_kes: number
+          unit: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name: string
+          price_kes: number
+          unit?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string
+          display_order?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          price_kes?: number
+          unit?: string
+        }
+        Relationships: []
+      }
       admin_login_attempts: {
         Row: {
           created_at: string
@@ -184,6 +217,45 @@ export type Database = {
         }
         Relationships: []
       }
+      articles: {
+        Row: {
+          author: string
+          body: string
+          created_at: string
+          excerpt: string
+          id: string
+          is_published: boolean
+          published_at: string | null
+          slug: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author?: string
+          body: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          body?: string
+          created_at?: string
+          excerpt?: string
+          id?: string
+          is_published?: boolean
+          published_at?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       assets: {
         Row: {
           asset_code: string | null
@@ -259,6 +331,27 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_dates: {
+        Row: {
+          created_at: string
+          date: string
+          id: string
+          reason: string | null
+        }
+        Insert: {
+          created_at?: string
+          date: string
+          id?: string
+          reason?: string | null
+        }
+        Update: {
+          created_at?: string
+          date?: string
+          id?: string
+          reason?: string | null
+        }
+        Relationships: []
+      }
       booking_assignments: {
         Row: {
           booking_id: string
@@ -312,9 +405,11 @@ export type Database = {
       }
       bookings: {
         Row: {
+          add_ons: Json
           admin_notes: string | null
           county: string
           created_at: string
+          discount_kes: number
           email: string
           estimated_cost_kes: number
           event_date: string
@@ -325,16 +420,20 @@ export type Database = {
           package_price_kes: number
           package_slug: string
           phone: string
+          promo_code: string | null
           reference: string
+          referral_code: string | null
           special_instructions: string | null
           status: string
           updated_at: string
           venue: string
         }
         Insert: {
+          add_ons?: Json
           admin_notes?: string | null
           county: string
           created_at?: string
+          discount_kes?: number
           email: string
           estimated_cost_kes: number
           event_date: string
@@ -345,16 +444,20 @@ export type Database = {
           package_price_kes: number
           package_slug: string
           phone: string
+          promo_code?: string | null
           reference: string
+          referral_code?: string | null
           special_instructions?: string | null
           status?: string
           updated_at?: string
           venue: string
         }
         Update: {
+          add_ons?: Json
           admin_notes?: string | null
           county?: string
           created_at?: string
+          discount_kes?: number
           email?: string
           estimated_cost_kes?: number
           event_date?: string
@@ -365,11 +468,43 @@ export type Database = {
           package_price_kes?: number
           package_slug?: string
           phone?: string
+          promo_code?: string | null
           reference?: string
+          referral_code?: string | null
           special_instructions?: string | null
           status?: string
           updated_at?: string
           venue?: string
+        }
+        Relationships: []
+      }
+      callback_requests: {
+        Row: {
+          created_at: string
+          full_name: string
+          id: string
+          notes: string | null
+          phone: string
+          preferred_time: string | null
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          full_name: string
+          id?: string
+          notes?: string | null
+          phone: string
+          preferred_time?: string | null
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          full_name?: string
+          id?: string
+          notes?: string | null
+          phone?: string
+          preferred_time?: string | null
+          status?: string
         }
         Relationships: []
       }
@@ -594,6 +729,33 @@ export type Database = {
         }
         Relationships: []
       }
+      leads: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string
+          id: string
+          phone: string
+          source: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name: string
+          id?: string
+          phone: string
+          source?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string
+          id?: string
+          phone?: string
+          source?: string
+        }
+        Relationships: []
+      }
       notifications: {
         Row: {
           body: string | null
@@ -671,6 +833,45 @@ export type Database = {
           price_kes?: number
           slug?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      promo_codes: {
+        Row: {
+          code: string
+          created_at: string
+          discount_type: string
+          discount_value: number
+          expires_at: string | null
+          id: string
+          is_active: boolean
+          max_uses: number | null
+          note: string | null
+          times_used: number
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          discount_type?: string
+          discount_value: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          note?: string | null
+          times_used?: number
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          discount_type?: string
+          discount_value?: number
+          expires_at?: string | null
+          id?: string
+          is_active?: boolean
+          max_uses?: number | null
+          note?: string | null
+          times_used?: number
         }
         Relationships: []
       }
@@ -787,6 +988,36 @@ export type Database = {
           created_at?: string
           id?: number
           identifier?: string
+        }
+        Relationships: []
+      }
+      referral_codes: {
+        Row: {
+          code: string
+          created_at: string
+          id: string
+          referrer_name: string
+          referrer_phone: string
+          reward_code: string | null
+          reward_given: boolean
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          id?: string
+          referrer_name: string
+          referrer_phone: string
+          reward_code?: string | null
+          reward_given?: boolean
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          id?: string
+          referrer_name?: string
+          referrer_phone?: string
+          reward_code?: string | null
+          reward_given?: boolean
         }
         Relationships: []
       }
@@ -1034,6 +1265,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_promo: {
+        Args: { _code: string; _subtotal: number }
+        Returns: {
+          discount_kes: number
+          message: string
+          valid: boolean
+        }[]
+      }
       create_staff_account: {
         Args: {
           _created_by: string
@@ -1049,6 +1288,14 @@ export type Database = {
         }
         Returns: string
       }
+      get_unavailable_dates: {
+        Args: never
+        Returns: {
+          event_date: string
+          kind: string
+        }[]
+      }
+      redeem_promo: { Args: { _code: string }; Returns: undefined }
       update_account_password: {
         Args: { _id: string; _password: string }
         Returns: undefined
