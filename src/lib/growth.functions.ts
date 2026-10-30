@@ -167,7 +167,7 @@ export const adminUpsertAddOn = createServerFn({ method: "POST" })
     const admin = await requireAdmin(data.token);
     const row = {
       name: data.name,
-      description: data.description || null,
+      description: data.description || "",
       price_kes: data.price_kes,
       unit: data.unit,
       is_active: data.is_active ?? true,
@@ -216,7 +216,7 @@ export const adminUpsertReferral = createServerFn({ method: "POST" })
     const row = {
       code: data.code.toUpperCase(),
       referrer_name: data.referrer_name,
-      referrer_phone: data.referrer_phone || null,
+      referrer_phone: data.referrer_phone || "",
     };
     if (data.id) {
       const { error } = await supabaseAdmin.from("referral_codes").update(row).eq("id", data.id);
