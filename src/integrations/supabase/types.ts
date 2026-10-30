@@ -1300,6 +1300,13 @@ export type Database = {
         Args: { _id: string; _password: string }
         Returns: undefined
       }
+      validate_referral: {
+        Args: { _code: string }
+        Returns: {
+          referrer_name: string
+          valid: boolean
+        }[]
+      }
       verify_admin_password: {
         Args: { _password: string; _username: string }
         Returns: {
