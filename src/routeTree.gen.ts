@@ -16,7 +16,9 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as FaqRouteImport } from './routes/faq'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as GuidesRouteImport } from './routes/guides'
 import { Route as PricingRouteImport } from './routes/pricing'
+import { Route as ReferRouteImport } from './routes/refer'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as ReviewsRouteImport } from './routes/reviews'
 import { Route as ServicesRouteImport } from './routes/services'
@@ -48,6 +50,7 @@ import { Route as AdminServicesRouteImport } from './routes/admin/services'
 import { Route as AdminStaffRouteImport } from './routes/admin/staff'
 import { Route as AdminTicketsRouteImport } from './routes/admin/tickets'
 import { Route as AdminWarmupRouteImport } from './routes/admin/warmup'
+import { Route as GuidesSlugRouteImport } from './routes/guides.$slug'
 import { Route as QuoteReferenceRouteImport } from './routes/quote.$reference'
 import { Route as ApiPublicHooksWarmupRouteImport } from './routes/api/public/hooks/warmup'
 
@@ -86,9 +89,19 @@ const GalleryRoute = GalleryRouteImport.update({
   path: '/gallery',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesRoute = GuidesRouteImport.update({
+  id: '/guides',
+  path: '/guides',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const PricingRoute = PricingRouteImport.update({
   id: '/pricing',
   path: '/pricing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ReferRoute = ReferRouteImport.update({
+  id: '/refer',
+  path: '/refer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -246,6 +259,11 @@ const AdminWarmupRoute = AdminWarmupRouteImport.update({
   path: '/admin/warmup',
   getParentRoute: () => rootRouteImport,
 } as any)
+const GuidesSlugRoute = GuidesSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => GuidesRoute,
+} as any)
 const QuoteReferenceRoute = QuoteReferenceRouteImport.update({
   id: '/quote/$reference',
   path: '/quote/$reference',
@@ -265,7 +283,9 @@ export interface FileRoutesByFullPath {
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/gallery': typeof GalleryRoute
+  '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
+  '/refer': typeof ReferRoute
   '/reset-password': typeof ResetPasswordRoute
   '/reviews': typeof ReviewsRoute
   '/services': typeof ServicesRoute
@@ -296,6 +316,7 @@ export interface FileRoutesByFullPath {
   '/admin/staff': typeof AdminStaffRoute
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/warmup': typeof AdminWarmupRoute
+  '/guides/$slug': typeof GuidesSlugRoute
   '/quote/$reference': typeof QuoteReferenceRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
@@ -308,7 +329,9 @@ export interface FileRoutesByTo {
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/gallery': typeof GalleryRoute
+  '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
+  '/refer': typeof ReferRoute
   '/reset-password': typeof ResetPasswordRoute
   '/reviews': typeof ReviewsRoute
   '/services': typeof ServicesRoute
@@ -339,6 +362,7 @@ export interface FileRoutesByTo {
   '/admin/staff': typeof AdminStaffRoute
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/warmup': typeof AdminWarmupRoute
+  '/guides/$slug': typeof GuidesSlugRoute
   '/quote/$reference': typeof QuoteReferenceRoute
   '/admin': typeof AdminIndexRoute
   '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
@@ -352,7 +376,9 @@ export interface FileRoutesById {
   '/faq': typeof FaqRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/gallery': typeof GalleryRoute
+  '/guides': typeof GuidesRouteWithChildren
   '/pricing': typeof PricingRoute
+  '/refer': typeof ReferRoute
   '/reset-password': typeof ResetPasswordRoute
   '/reviews': typeof ReviewsRoute
   '/services': typeof ServicesRoute
@@ -383,6 +409,7 @@ export interface FileRoutesById {
   '/admin/staff': typeof AdminStaffRoute
   '/admin/tickets': typeof AdminTicketsRoute
   '/admin/warmup': typeof AdminWarmupRoute
+  '/guides/$slug': typeof GuidesSlugRoute
   '/quote/$reference': typeof QuoteReferenceRoute
   '/admin/': typeof AdminIndexRoute
   '/api/public/hooks/warmup': typeof ApiPublicHooksWarmupRoute
@@ -397,7 +424,9 @@ export interface FileRouteTypes {
     | '/faq'
     | '/forgot-password'
     | '/gallery'
+    | '/guides'
     | '/pricing'
+    | '/refer'
     | '/reset-password'
     | '/reviews'
     | '/services'
@@ -428,6 +457,7 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/tickets'
     | '/admin/warmup'
+    | '/guides/$slug'
     | '/quote/$reference'
     | '/admin/'
     | '/api/public/hooks/warmup'
@@ -440,7 +470,9 @@ export interface FileRouteTypes {
     | '/faq'
     | '/forgot-password'
     | '/gallery'
+    | '/guides'
     | '/pricing'
+    | '/refer'
     | '/reset-password'
     | '/reviews'
     | '/services'
@@ -471,6 +503,7 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/tickets'
     | '/admin/warmup'
+    | '/guides/$slug'
     | '/quote/$reference'
     | '/admin'
     | '/api/public/hooks/warmup'
@@ -483,7 +516,9 @@ export interface FileRouteTypes {
     | '/faq'
     | '/forgot-password'
     | '/gallery'
+    | '/guides'
     | '/pricing'
+    | '/refer'
     | '/reset-password'
     | '/reviews'
     | '/services'
@@ -514,6 +549,7 @@ export interface FileRouteTypes {
     | '/admin/staff'
     | '/admin/tickets'
     | '/admin/warmup'
+    | '/guides/$slug'
     | '/quote/$reference'
     | '/admin/'
     | '/api/public/hooks/warmup'
@@ -527,7 +563,9 @@ export interface RootRouteChildren {
   FaqRoute: typeof FaqRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   GalleryRoute: typeof GalleryRoute
+  GuidesRoute: typeof GuidesRouteWithChildren
   PricingRoute: typeof PricingRoute
+  ReferRoute: typeof ReferRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   ReviewsRoute: typeof ReviewsRoute
   ServicesRoute: typeof ServicesRoute
@@ -614,11 +652,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GalleryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guides': {
+      id: '/guides'
+      path: '/guides'
+      fullPath: '/guides'
+      preLoaderRoute: typeof GuidesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/pricing': {
       id: '/pricing'
       path: '/pricing'
       fullPath: '/pricing'
       preLoaderRoute: typeof PricingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/refer': {
+      id: '/refer'
+      path: '/refer'
+      fullPath: '/refer'
+      preLoaderRoute: typeof ReferRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/reset-password': {
@@ -838,6 +890,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminWarmupRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/guides/$slug': {
+      id: '/guides/$slug'
+      path: '/$slug'
+      fullPath: '/guides/$slug'
+      preLoaderRoute: typeof GuidesSlugRouteImport
+      parentRoute: typeof GuidesRoute
+    }
     '/quote/$reference': {
       id: '/quote/$reference'
       path: '/quote/$reference'
@@ -855,6 +914,17 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface GuidesRouteChildren {
+  GuidesSlugRoute: typeof GuidesSlugRoute
+}
+
+const GuidesRouteChildren: GuidesRouteChildren = {
+  GuidesSlugRoute: GuidesSlugRoute,
+}
+
+const GuidesRouteWithChildren =
+  GuidesRoute._addFileChildren(GuidesRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BookRoute: BookRoute,
@@ -863,7 +933,9 @@ const rootRouteChildren: RootRouteChildren = {
   FaqRoute: FaqRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   GalleryRoute: GalleryRoute,
+  GuidesRoute: GuidesRouteWithChildren,
   PricingRoute: PricingRoute,
+  ReferRoute: ReferRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   ReviewsRoute: ReviewsRoute,
   ServicesRoute: ServicesRoute,
