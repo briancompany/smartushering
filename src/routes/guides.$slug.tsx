@@ -26,7 +26,7 @@ const guideQuery = (slug: string) =>
   });
 
 export const Route = createFileRoute("/guides/$slug")({
-  head: ({ loaderData }) => ({
+  head: ({ loaderData }: { loaderData?: Article }) => ({
     meta: [
       { title: loaderData ? `${loaderData.title} — Smart Ushering` : "Guide — Smart Ushering" },
       { name: "description", content: loaderData?.excerpt ?? "Event planning guides from Smart Ushering Kenya." },
