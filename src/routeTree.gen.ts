@@ -40,6 +40,7 @@ import { Route as AdminChatsRouteImport } from './routes/admin/chats'
 import { Route as AdminFaqsRouteImport } from './routes/admin/faqs'
 import { Route as AdminGalleryRouteImport } from './routes/admin/gallery'
 import { Route as AdminGrievancesRouteImport } from './routes/admin/grievances'
+import { Route as AdminGrowthRouteImport } from './routes/admin/growth'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminMessagesRouteImport } from './routes/admin/messages'
 import { Route as AdminNotificationsRouteImport } from './routes/admin/notifications'
@@ -209,6 +210,11 @@ const AdminGrievancesRoute = AdminGrievancesRouteImport.update({
   path: '/admin/grievances',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AdminGrowthRoute = AdminGrowthRouteImport.update({
+  id: '/admin/growth',
+  path: '/admin/growth',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/admin/login',
   path: '/admin/login',
@@ -306,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/grievances': typeof AdminGrievancesRoute
+  '/admin/growth': typeof AdminGrowthRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -352,6 +359,7 @@ export interface FileRoutesByTo {
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/grievances': typeof AdminGrievancesRoute
+  '/admin/growth': typeof AdminGrowthRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -399,6 +407,7 @@ export interface FileRoutesById {
   '/admin/faqs': typeof AdminFaqsRoute
   '/admin/gallery': typeof AdminGalleryRoute
   '/admin/grievances': typeof AdminGrievancesRoute
+  '/admin/growth': typeof AdminGrowthRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/messages': typeof AdminMessagesRoute
   '/admin/notifications': typeof AdminNotificationsRoute
@@ -447,6 +456,7 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/gallery'
     | '/admin/grievances'
+    | '/admin/growth'
     | '/admin/login'
     | '/admin/messages'
     | '/admin/notifications'
@@ -493,6 +503,7 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/gallery'
     | '/admin/grievances'
+    | '/admin/growth'
     | '/admin/login'
     | '/admin/messages'
     | '/admin/notifications'
@@ -539,6 +550,7 @@ export interface FileRouteTypes {
     | '/admin/faqs'
     | '/admin/gallery'
     | '/admin/grievances'
+    | '/admin/growth'
     | '/admin/login'
     | '/admin/messages'
     | '/admin/notifications'
@@ -586,6 +598,7 @@ export interface RootRouteChildren {
   AdminFaqsRoute: typeof AdminFaqsRoute
   AdminGalleryRoute: typeof AdminGalleryRoute
   AdminGrievancesRoute: typeof AdminGrievancesRoute
+  AdminGrowthRoute: typeof AdminGrowthRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminMessagesRoute: typeof AdminMessagesRoute
   AdminNotificationsRoute: typeof AdminNotificationsRoute
@@ -820,6 +833,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminGrievancesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin/growth': {
+      id: '/admin/growth'
+      path: '/admin/growth'
+      fullPath: '/admin/growth'
+      preLoaderRoute: typeof AdminGrowthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/admin/login'
@@ -956,6 +976,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminFaqsRoute: AdminFaqsRoute,
   AdminGalleryRoute: AdminGalleryRoute,
   AdminGrievancesRoute: AdminGrievancesRoute,
+  AdminGrowthRoute: AdminGrowthRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminMessagesRoute: AdminMessagesRoute,
   AdminNotificationsRoute: AdminNotificationsRoute,
