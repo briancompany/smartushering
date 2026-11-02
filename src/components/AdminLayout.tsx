@@ -1,7 +1,7 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState, type ReactNode } from "react";
-import { LayoutDashboard, Calendar, DollarSign, Wrench, Image as ImageIcon, MessageSquare, HelpCircle, LogOut, ArrowLeft, Menu, X, Users, ClipboardCheck, FileText, BarChart3, ShieldCheck, Mail, Star, Database, UserCog, Megaphone, Package, AlertTriangle, Flame, LifeBuoy } from "lucide-react";
+import { LayoutDashboard, Calendar, DollarSign, Wrench, Image as ImageIcon, MessageSquare, HelpCircle, LogOut, ArrowLeft, Menu, X, Users, ClipboardCheck, FileText, BarChart3, ShieldCheck, Mail, Star, Database, UserCog, Megaphone, Package, AlertTriangle, Flame, LifeBuoy, TrendingUp } from "lucide-react";
 import { NotificationBell } from "./NotificationBell";
 import { AvatarUploader, ProfileAvatar } from "./AvatarUploader";
 import { getSession, clearSession, canAccess, ROLE_LABELS, type Session } from "@/lib/auth-client";
@@ -11,6 +11,7 @@ type NavItem = { to: string; label: string; Icon: typeof LayoutDashboard; key: s
 const NAV: NavItem[] = [
   { to: "/admin", label: "Dashboard", Icon: LayoutDashboard, key: "dashboard", exact: true },
   { to: "/admin/analytics", label: "Analytics", Icon: BarChart3, key: "analytics" },
+  { to: "/admin/growth", label: "Growth", Icon: TrendingUp, key: "growth" },
   { to: "/admin/bookings", label: "Bookings", Icon: Calendar, key: "bookings" },
   { to: "/admin/calendar", label: "Calendar", Icon: Calendar, key: "calendar" },
   { to: "/admin/staff", label: "Staff", Icon: Users, key: "staff" },

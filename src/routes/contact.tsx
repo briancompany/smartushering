@@ -46,6 +46,7 @@ function Page() {
               </ul>
               <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="mt-5 inline-block rounded-md bg-[#25D366] px-5 py-2.5 text-sm font-semibold text-white">Chat on WhatsApp</a>
             </div>
+            <CallbackForm />
             <div className="overflow-hidden rounded-2xl border bg-white">
               <iframe title="Nairobi map" src="https://www.google.com/maps?q=Nairobi,Kenya&output=embed" className="h-64 w-full" loading="lazy" />
             </div>
@@ -69,5 +70,46 @@ function Page() {
       </section>
       <style>{`.input{width:100%;border:1px solid var(--color-border);border-radius:0.5rem;padding:0.625rem 0.75rem;font-size:0.875rem;background:white}`}</style>
     </PublicLayout>
+  );
+}
+
+function CallbackForm() {
+  const [form, setForm] = useState({ full_name: "", phone: "", preferred_time: "", notes: "" });
+  const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const { error } = await supabase.from("callback_requests").insert({
+      full_name: form.full_name.trim(),
+      phone: form.phone.trim(),
+      preferred_time: form.preferred_time.trim() || null,
+      notes: form.notes.trim() || null,
+    });
+    setBusy(false);
+    if (error) { toast.error("Could not send your request. Please try again."); return; }
+    setSent(true);
+    toast.success("Callback requested — we'll call you.");
+  };
+
+  return (
+    <div className="rounded-2xl border bg-white p-6 shadow-sm">
+      <h2 className="font-display text-xl font-semibold text-navy">Request a callback</h2>
+      <p className="mt-1 text-sm text-muted-foreground">Too busy to chat? Tell us when to call and we'll ring you.</p>
+      {sent ? (
+        <p className="mt-4 rounded-md bg-gold/10 p-4 text-sm text-navy">Got it! Expect our call at the time you chose.</p>
+      ) : (
+        <form onSubmit={submit} className="mt-4 grid gap-3">
+          <input required placeholder="Full name" className="input" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+          <input required type="tel" placeholder="Phone number" className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <input placeholder="Preferred time (e.g. Tomorrow 2 PM)" className="input" value={form.preferred_time} onChange={(e) => setForm({ ...form, preferred_time: e.target.value })} />
+          <textarea rows={3} placeholder="What would you like to discuss? (optional)" className="input" value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} />
+          <button disabled={busy} className="rounded-md bg-navy py-3 text-sm font-semibold text-primary-foreground disabled:opacity-60">
+            {busy ? "Sending…" : "Request a callback"}
+          </button>
+        </form>
+      )}
+    </div>
   );
 }

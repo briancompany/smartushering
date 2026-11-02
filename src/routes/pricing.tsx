@@ -1,7 +1,10 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useSuspenseQuery, queryOptions } from "@tanstack/react-query";
-import { Check } from "lucide-react";
+import { useState } from "react";
+import { Check, Download, Send } from "lucide-react";
+import { toast } from "sonner";
 import { PublicLayout } from "@/components/PublicLayout";
+import { RateCardPreview, type RateCardPackage } from "@/components/RateCardPreview";
 import { supabase } from "@/integrations/supabase/client";
 
 const q = queryOptions({
@@ -11,7 +14,7 @@ const q = queryOptions({
       supabase.from("pricing_packages").select("*").order("display_order"),
       supabase.from("site_settings").select("*").in("key", ["transport_nairobi_kes"]),
     ]);
-    return { packages: pkgs.data ?? [], transport: settings.data?.find((s) => s.key === "transport_nairobi_kes")?.value ?? "200" };
+    return { packages: (pkgs.data ?? []) as unknown as RateCardPackage[], transport: settings.data?.find((s) => s.key === "transport_nairobi_kes")?.value ?? "200" };
   },
 });
 
@@ -29,6 +32,8 @@ export const Route = createFileRoute("/pricing")({
 
 function Page() {
   const { data } = useSuspenseQuery(q);
+  const [showRateCard, setShowRateCard] = useState(false);
+
   return (
     <PublicLayout>
       <section className="gradient-navy py-16 text-primary-foreground">
@@ -50,7 +55,7 @@ function Page() {
               </div>
               <p className="mt-3 text-sm text-muted-foreground">{p.description}</p>
               <ul className="mt-6 space-y-2 text-sm">
-                {(p.features as string[]).map((f) => (
+                {(Array.isArray(p.features) ? p.features.filter((f): f is string => typeof f === "string") : []).map((f) => (
                   <li key={f} className="flex items-center gap-2"><Check className="h-4 w-4 text-gold" />{f}</li>
                 ))}
               </ul>
@@ -67,7 +72,62 @@ function Page() {
             <li>• Host specifies number of ushers required</li>
           </ul>
         </div>
+        <div className="mx-auto mt-12 grid max-w-5xl gap-6 px-4 sm:px-0 md:grid-cols-2">
+          <div className="rounded-2xl border bg-white p-8 shadow-sm">
+            <h3 className="font-display text-lg font-semibold text-navy">Download the rate card</h3>
+            <p className="mt-2 text-sm text-muted-foreground">A one-page PDF with all current packages, prices and charges. It always reflects our latest rates.</p>
+            <button
+              onClick={() => setShowRateCard(true)}
+              className="mt-5 inline-flex items-center gap-2 rounded-md bg-navy px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90"
+            >
+              <Download className="h-4 w-4" /> View & download rate card
+            </button>
+          </div>
+          <RateCardLeadForm />
+        </div>
       </section>
+      {showRateCard && <RateCardPreview packages={data.packages} transport={data.transport} onClose={() => setShowRateCard(false)} />}
     </PublicLayout>
+  );
+}
+
+function RateCardLeadForm() {
+  const [form, setForm] = useState({ full_name: "", phone: "", email: "" });
+  const [sent, setSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setBusy(true);
+    const { error } = await supabase.from("leads").insert({
+      full_name: form.full_name.trim(),
+      phone: form.phone.trim(),
+      email: form.email.trim() || null,
+      source: "rate_card_page",
+    });
+    setBusy(false);
+    if (error) { toast.error("Could not send your request. Please try again."); return; }
+    setSent(true);
+    toast.success("Request received — we'll send the rate card shortly.");
+  };
+
+  return (
+    <div className="rounded-2xl border bg-white p-8 shadow-sm">
+      <h3 className="font-display text-lg font-semibold text-navy">Get the rate card sent to you</h3>
+      <p className="mt-2 text-sm text-muted-foreground">Share your details and we'll WhatsApp or email the full rate card, including any special offers.</p>
+      {sent ? (
+        <p className="mt-4 rounded-md bg-gold/10 p-4 text-sm text-navy">Thank you! We'll reach out shortly with the rate card. You can also download it instantly from the button beside this form.</p>
+      ) : (
+        <form onSubmit={submit} className="mt-4 grid gap-3">
+          <input required placeholder="Full name" className="input" value={form.full_name} onChange={(e) => setForm({ ...form, full_name: e.target.value })} />
+          <input required type="tel" placeholder="Phone (WhatsApp preferred)" className="input" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+          <input type="email" placeholder="Email (optional)" className="input" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+          <button disabled={busy} className="inline-flex items-center justify-center gap-2 rounded-md bg-gold py-3 text-sm font-semibold text-gold-foreground hover:opacity-90 disabled:opacity-60">
+            <Send className="h-4 w-4" /> {busy ? "Sending…" : "Send me the rate card"}
+          </button>
+        </form>
+      )}
+      <style>{`.input{width:100%;border:1px solid var(--color-border);border-radius:0.5rem;padding:0.625rem 0.75rem;font-size:0.875rem;background:white}`}</style>
+    </div>
   );
 }
