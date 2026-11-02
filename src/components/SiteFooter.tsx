@@ -18,6 +18,8 @@ export function SiteFooter() {
             <li><Link to="/book" className="hover:text-gold">Book Event</Link></li>
             <li><Link to="/gallery" className="hover:text-gold">Gallery</Link></li>
             <li><Link to="/faq" className="hover:text-gold">FAQ</Link></li>
+            <li><Link to="/guides" className="hover:text-gold">Planning Guides</Link></li>
+            <li><Link to="/refer" className="hover:text-gold">Refer & Earn</Link></li>
           </ul>
         </div>
         <div>
