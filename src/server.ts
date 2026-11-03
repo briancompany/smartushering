@@ -61,6 +61,9 @@ const CSP = [
   "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.lovable.app",
   "media-src 'self' blob: https://*.supabase.co",
   "worker-src 'self' blob:",
+  // Google Maps is embedded on the Contact page; wa.me links open by
+  // top-level navigation so they need no frame allowance.
+  "frame-src 'self' https://www.google.com https://maps.google.com",
   "frame-ancestors 'self'",
   "form-action 'self'",
   "base-uri 'self'",
