@@ -14,6 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
+      active_sessions: {
+        Row: {
+          last_seen: string
+          path: string
+          session_id: string
+        }
+        Insert: {
+          last_seen?: string
+          path: string
+          session_id: string
+        }
+        Update: {
+          last_seen?: string
+          path?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
       add_ons: {
         Row: {
           created_at: string
@@ -573,6 +591,30 @@ export type Database = {
           },
         ]
       }
+      click_events: {
+        Row: {
+          created_at: string
+          element: string
+          id: string
+          path: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          element: string
+          id?: string
+          path: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          element?: string
+          id?: string
+          path?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
       client_event_tokens: {
         Row: {
           booking_id: string
@@ -729,6 +771,33 @@ export type Database = {
         }
         Relationships: []
       }
+      heatmap_clicks: {
+        Row: {
+          created_at: string
+          id: string
+          path: string
+          session_id: string
+          x_pct: number
+          y_pct: number
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          path: string
+          session_id: string
+          x_pct: number
+          y_pct: number
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          path?: string
+          session_id?: string
+          x_pct?: number
+          y_pct?: number
+        }
+        Relationships: []
+      }
       leads: {
         Row: {
           created_at: string
@@ -802,6 +871,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      page_views: {
+        Row: {
+          created_at: string
+          device: string
+          id: string
+          path: string
+          referrer: string | null
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          device: string
+          id?: string
+          path: string
+          referrer?: string | null
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          device?: string
+          id?: string
+          path?: string
+          referrer?: string | null
+          session_id?: string
+        }
+        Relationships: []
       }
       pricing_packages: {
         Row: {
@@ -1265,6 +1361,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      analytics_heartbeat: {
+        Args: { p_path: string; p_session_id: string }
+        Returns: undefined
+      }
       check_promo: {
         Args: { _code: string; _subtotal: number }
         Returns: {

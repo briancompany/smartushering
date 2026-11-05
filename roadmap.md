@@ -1,4 +1,4 @@
-# Layout fixes
-- [x] Fix shared public/admin sizing and viewport settings.
-- [x] Keep Accounts & roles fields, labels, tables, and actions contained.
-- [x] Verify narrow screens and reduced-width zoom equivalents (240, 320, 360, and 1280px); admin sign-in succeeds and tested pages have no horizontal document overflow or runtime errors.
+# Privacy-first analytics
+- [ ] Stage 1: Add anonymous analytics storage, access controls, and public-page tracker.
+- [ ] Stage 2: Add authenticated live visitor, page-view, top-page, and device charts.
+- [ ] Stage 3: Add booking funnel, click categories, day/hour heatmap, and click-map viewer; verify.
