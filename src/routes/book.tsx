@@ -5,6 +5,7 @@ import { toast } from "sonner";
 import { CheckCircle2, ArrowLeft, BadgePercent, Users, X } from "lucide-react";
 import { PublicLayout } from "@/components/PublicLayout";
 import { supabase } from "@/integrations/supabase/client";
+import { recordClickEvent } from "@/lib/visitor-analytics";
 
 type Pkg = { id: string; slug: string; name: string; description: string; price_kes: number; features: unknown };
 type AddOn = { id: string; name: string; description: string; price_kes: number; unit: string; is_active: boolean };
@@ -158,6 +159,7 @@ function Page() {
         if (rErr) console.warn("promo redeem failed:", rErr.message);
       });
     }
+    recordClickEvent("booking_success");
     setSubmitted({ reference, cost: estimate });
   };
 

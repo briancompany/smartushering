@@ -12,6 +12,7 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { recordInteractiveClick, recordPageView } from "../lib/visitor-analytics";
 
 function NotFoundComponent() {
   return (
@@ -113,6 +114,18 @@ function RootShell({ children }: { children: ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  useEffect(() => {
+    recordPageView(pathname);
+  }, [pathname]);
+
+  useEffect(() => {
+    const trackClick = (event: MouseEvent) => recordInteractiveClick(event.target, event.clientX, event.clientY);
+    document.addEventListener("click", trackClick, true);
+    return () => document.removeEventListener("click", trackClick, true);
+  }, []);
+
   return (
     <QueryClientProvider client={queryClient}>
       <Outlet />
