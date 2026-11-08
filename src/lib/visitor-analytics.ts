@@ -60,13 +60,20 @@ export function recordPageView(pathname: string) {
   } catch {
     // Page-view recording can continue for this route without persisted state.
   }
-  void supabase.from("page_views").insert({
+  void Promise.resolve(supabase.from("page_views").insert({
     path,
     referrer,
     device: deviceClass(),
     session_id: visit.id,
-  }).then(() => undefined).catch(() => undefined);
-  void supabase.rpc("analytics_heartbeat", { p_session_id: visit.id, p_path: path }).then(() => undefined).catch(() => undefined);
+  })).then(() => undefined).catch(() => undefined);
+  void Promise.resolve(supabase.rpc("analytics_heartbeat", { p_session_id: visit.id, p_path: path })).then(() => undefined).catch(() => undefined);
+}
+
+export function updateActiveVisitor(pathname: string) {
+  const path = safePath(pathname);
+  const visit = visitState();
+  if (!path || !visit || document.visibilityState !== "visible") return;
+  void Promise.resolve(supabase.rpc("analytics_heartbeat", { p_session_id: visit.id, p_path: path })).then(() => undefined).catch(() => undefined);
 }
 
 const CLICK_CATEGORIES = new Set(["internal_link", "external_link", "button", "other_control", "booking_success"]);
@@ -75,7 +82,7 @@ export function recordClickEvent(category: string, pathname = window.location.pa
   const path = safePath(pathname);
   const visit = visitState();
   if (!path || !visit || !CLICK_CATEGORIES.has(category)) return;
-  void supabase.from("click_events").insert({ path, element: category, session_id: visit.id })
+  void Promise.resolve(supabase.from("click_events").insert({ path, element: category, session_id: visit.id }))
     .then(() => undefined).catch(() => undefined);
 }
 
@@ -104,10 +111,10 @@ export function recordInteractiveClick(target: EventTarget | null, clientX: numb
   const pageHeight = Math.max(document.documentElement.scrollHeight, window.innerHeight, 1);
   const xPct = Math.max(0, Math.min(100, (clientX / Math.max(window.innerWidth, 1)) * 100));
   const yPct = Math.max(0, Math.min(100, ((clientY + window.scrollY) / pageHeight) * 100));
-  void supabase.from("heatmap_clicks").insert({
+  void Promise.resolve(supabase.from("heatmap_clicks").insert({
     path,
     x_pct: Number(xPct.toFixed(2)),
     y_pct: Number(yPct.toFixed(2)),
     session_id: visit.id,
-  }).then(() => undefined).catch(() => undefined);
+  })).then(() => undefined).catch(() => undefined);
 }

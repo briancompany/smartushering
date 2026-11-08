@@ -1,6 +1,5 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
-import { supabaseAdmin } from "@/integrations/supabase/client.server";
 import { requireRole } from "./admin.functions";
 
 const querySchema = z.object({
@@ -17,11 +16,13 @@ export const getVisitorAnalytics = createServerFn({ method: "POST" })
   .inputValidator((input) => querySchema.parse(input))
   .handler(async ({ data }) => {
     await requireRole(data.token, ["super_admin", "finance_reporting"]);
-    const fromDate = new Date(Date.now() - data.days * 24 * 60 * 60 * 1000);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const today = new Date();
+    const fromDate = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate() - data.days + 1));
     const from = fromDate.toISOString();
     const now = new Date().toISOString();
     const [viewsResult, clickResult, heatmapResult, activeResult] = await Promise.all([
-      supabaseAdmin.from("page_views").select("path, referrer, device, session_id, created_at").gte("created_at", from).order("created_at", { ascending: true }).limit(10000),
+      supabaseAdmin.from("page_views").select("path, referrer, device, session_id, created_at").gte("created_at", from).order("created_at", { ascending: false }).limit(10000),
       supabaseAdmin.from("click_events").select("path, element, session_id, created_at").gte("created_at", from).order("created_at", { ascending: false }).limit(10000),
       data.path
         ? supabaseAdmin.from("heatmap_clicks").select("x_pct, y_pct").eq("path", data.path).gte("created_at", from).order("created_at", { ascending: false }).limit(1200)
@@ -32,12 +33,13 @@ export const getVisitorAnalytics = createServerFn({ method: "POST" })
     const failures = [viewsResult.error, clickResult.error, heatmapResult.error, activeResult.error].filter(Boolean);
     if (failures.length) throw new Error("Visitor analytics are temporarily unavailable. Please try again.");
 
-    const views = viewsResult.data ?? [];
+    const views = [...(viewsResult.data ?? [])].sort((left, right) => left.created_at.localeCompare(right.created_at));
     const clicks = clickResult.data ?? [];
     const active = activeResult.data ?? [];
     const uniqueVisits = new Set(views.map((row) => row.session_id));
     const pathViews = new Map<string, number>();
-    const devices = new Map<string, number>();
+    const deviceByVisit = new Map<string, string>();
+    const deviceCounts = new Map<string, number>();
     const referrers = new Map<string, number>();
     const daily = new Map<string, { visits: Set<string>; views: number }>();
     const funnelVisits = new Set<string>();
@@ -46,10 +48,11 @@ export const getVisitorAnalytics = createServerFn({ method: "POST" })
     const weekdayHours = Array.from({ length: 7 }, () => Array.from({ length: 24 }, () => 0));
     const activeByPath = new Map<string, number>();
 
+    const firstPageByVisit = new Map<string, (typeof views)[number]>();
     for (const row of views) {
       addCount(pathViews, row.path);
-      addCount(devices, row.device);
-      addCount(referrers, row.referrer || "Direct / unknown");
+      if (!deviceByVisit.has(row.session_id)) deviceByVisit.set(row.session_id, row.device);
+      if (!firstPageByVisit.has(row.session_id)) firstPageByVisit.set(row.session_id, row);
       const day = row.created_at.slice(0, 10);
       const bucket = daily.get(day) ?? { visits: new Set<string>(), views: 0 };
       bucket.visits.add(row.session_id);
@@ -58,10 +61,15 @@ export const getVisitorAnalytics = createServerFn({ method: "POST" })
       if (row.path === "/book") funnelVisits.add(row.session_id);
     }
 
+    for (const [sessionId, row] of firstPageByVisit) {
+      addCount(referrers, row.referrer || "Direct / unknown");
+      addCount(deviceCounts, deviceByVisit.get(sessionId) ?? row.device);
+    }
+
     for (const row of clicks) {
       addCount(clickCategories, row.element);
       if (row.element === "booking_success") completedVisits.add(row.session_id);
-      const date = new Date(row.created_at);
+      const date = new Date(new Date(row.created_at).getTime() + 3 * 60 * 60 * 1000);
       weekdayHours[date.getUTCDay()][date.getUTCHours()] += 1;
     }
 
@@ -78,8 +86,11 @@ export const getVisitorAnalytics = createServerFn({ method: "POST" })
     const completed = [...completedVisits].filter((id) => funnelVisits.has(id)).length;
     const heatmapBins = new Map<string, number>();
     for (const point of heatmapResult.data ?? []) {
-      const x = Math.min(9, Math.floor(Number(point.x_pct) / 10));
-      const y = Math.min(9, Math.floor(Number(point.y_pct) / 10));
+      const rawX = Number(point.x_pct);
+      const rawY = Number(point.y_pct);
+      if (!Number.isFinite(rawX) || !Number.isFinite(rawY)) continue;
+      const x = Math.max(0, Math.min(9, Math.floor(rawX / 10)));
+      const y = Math.max(0, Math.min(9, Math.floor(rawY / 10)));
       addCount(heatmapBins, `${x}:${y}`);
     }
     return {
@@ -96,7 +107,7 @@ export const getVisitorAnalytics = createServerFn({ method: "POST" })
       truncated: views.length === 10000 || clicks.length === 10000,
       trend,
       topPages: [...pathViews.entries()].map(([path, count]) => ({ path, count })).sort((a, b) => b.count - a.count).slice(0, 8),
-      devices: [...devices.entries()].map(([device, count]) => ({ device, count })).sort((a, b) => b.count - a.count),
+      devices: [...deviceCounts.entries()].map(([device, count]) => ({ device, count })).sort((a, b) => b.count - a.count),
       referrers: [...referrers.entries()].map(([source, count]) => ({ source, count })).sort((a, b) => b.count - a.count).slice(0, 8),
       activePages: [...activeByPath.entries()].map(([path, count]) => ({ path, count })).sort((a, b) => b.count - a.count),
       clickCategories: [...clickCategories.entries()].map(([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count),

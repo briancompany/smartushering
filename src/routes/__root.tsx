@@ -4,6 +4,7 @@ import {
   Link,
   createRootRouteWithContext,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
@@ -12,7 +13,7 @@ import { Toaster } from "sonner";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
-import { recordInteractiveClick, recordPageView } from "../lib/visitor-analytics";
+import { recordInteractiveClick, recordPageView, updateActiveVisitor } from "../lib/visitor-analytics";
 
 function NotFoundComponent() {
   return (
@@ -118,6 +119,17 @@ function RootComponent() {
 
   useEffect(() => {
     recordPageView(pathname);
+  }, [pathname]);
+
+  useEffect(() => {
+    updateActiveVisitor(pathname);
+    const heartbeat = window.setInterval(() => updateActiveVisitor(pathname), 60_000);
+    const onVisibilityChange = () => updateActiveVisitor(pathname);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      window.clearInterval(heartbeat);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, [pathname]);
 
   useEffect(() => {
